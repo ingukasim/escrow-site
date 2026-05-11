@@ -24,346 +24,364 @@ export default function CreateOrderPage() {
   const [loading, setLoading] =
     useState(false);
 
-  const [message, setMessage] =
-    useState("");
-
-  // CALCULATIONS
   const amountNumber =
     Number(amount || 0);
 
   let feeRate = 0;
 
   if (amountNumber < 500) {
+
     feeRate = 2;
+
   } else if (
     amountNumber >= 500 &&
     amountNumber <= 5000
   ) {
+
     feeRate = 1;
+
   } else {
+
     feeRate = 0.5;
+
   }
 
-  const totalFee =
+  /* CORRECT FEE CALCULATION */
+
+  const feeAmount =
     (amountNumber * feeRate) / 100;
 
   const sellerDeposit =
-    amountNumber + totalFee;
+    amountNumber + feeAmount;
 
   const buyerReceives =
-    amountNumber - totalFee;
+    amountNumber - feeAmount;
 
-  const handleCreateOrder = async (
-    e: any
-  ) => {
+  const handleCreateOrder =
+    async (e: any) => {
 
-    e.preventDefault();
+      e.preventDefault();
 
-    setLoading(true);
+      setLoading(true);
 
-    setMessage("");
+      try {
 
-    try {
+        const {
+          data: { user },
+        } =
+          await supabase.auth.getUser();
 
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        if (!user) {
 
-      if (!user) {
+          alert(
+            "Please login first"
+          );
 
-        setMessage(
-          "Please login first."
+          return;
+        }
+
+        const { error } =
+          await supabase
+            .from("orders")
+            .insert([
+              {
+                seller_id: user.id,
+
+                amount:
+                  amountNumber,
+
+                telegram,
+
+                booking_date:
+                  bookingDate,
+
+                booking_time:
+                  bookingTime,
+
+                fee_rate:
+                  feeRate,
+
+                total_fee:
+                  feeAmount,
+
+                seller_deposit:
+                  sellerDeposit,
+
+                buyer_receives:
+                  buyerReceives,
+
+                status:
+                  "Pending",
+              },
+            ]);
+
+        if (error) {
+
+          alert(error.message);
+
+        } else {
+
+          alert(
+            "Escrow order created successfully!"
+          );
+
+          router.push(
+            "/dashboard"
+          );
+
+        }
+
+      } catch (err) {
+
+        console.error(err);
+
+        alert(
+          "Something went wrong"
         );
 
-        setLoading(false);
-
-        return;
-      }
-
-      const { error } =
-        await supabase
-          .from("orders")
-          .insert([
-            {
-              seller_id: user.id,
-              amount: amountNumber,
-              telegram,
-              booking_date:
-                bookingDate,
-              booking_time:
-                bookingTime,
-              fee_rate: feeRate,
-              total_fee: totalFee,
-              seller_deposit:
-                sellerDeposit,
-              buyer_receives:
-                buyerReceives,
-              status: "Pending",
-            },
-          ]);
-
-      if (error) {
-
-        setMessage(error.message);
+      } finally {
 
         setLoading(false);
 
-        return;
       }
 
-      setMessage(
-        "✅ Escrow order created successfully!"
-      );
-
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 1500);
-
-    } catch (err) {
-
-      console.error(err);
-
-      setMessage(
-        "❌ Failed to create order"
-      );
-
-    } finally {
-
-      setLoading(false);
-
-    }
-
-  };
+    };
 
   return (
     <div className="min-h-screen bg-black text-white">
 
       <Navbar />
 
-      <div className="max-w-2xl mx-auto px-6 py-20">
+      <div className="max-w-4xl mx-auto px-6 py-20">
 
-        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10">
+        {/* HEADER */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 mb-10">
 
-          {/* HEADER */}
-          <div className="text-center mb-10">
+          <div className="text-yellow-400 text-sm mb-3">
+            Secure OTC Escrow
+          </div>
 
-            <div className="text-yellow-400 text-sm mb-3">
-              Secure OTC Escrow
+          <h1 className="text-5xl font-bold mb-4">
+            Create Escrow Deal
+          </h1>
+
+          <div className="text-zinc-400 text-lg">
+
+            Create secure manual
+            USDT escrow transactions.
+
+          </div>
+
+        </div>
+
+        {/* FORM */}
+        <form
+          onSubmit={
+            handleCreateOrder
+          }
+          className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 space-y-8"
+        >
+
+          {/* AMOUNT */}
+          <div>
+
+            <label className="block mb-3 text-zinc-300">
+
+              Transaction Amount
+              (USDT)
+
+            </label>
+
+            <input
+              type="number"
+              value={amount}
+              onChange={(e) =>
+                setAmount(
+                  e.target.value
+                )
+              }
+              placeholder="Enter amount"
+              className="w-full bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
+              required
+            />
+
+          </div>
+
+          {/* TELEGRAM */}
+          <div>
+
+            <label className="block mb-3 text-zinc-300">
+
+              Telegram Username
+
+            </label>
+
+            <input
+              type="text"
+              value={telegram}
+              onChange={(e) =>
+                setTelegram(
+                  e.target.value
+                )
+              }
+              placeholder="@yourtelegram"
+              className="w-full bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
+              required
+            />
+
+          </div>
+
+          {/* DATE */}
+          <div>
+
+            <label className="block mb-3 text-zinc-300">
+
+              Preferred Escrow Date
+
+            </label>
+
+            <input
+              type="date"
+              value={bookingDate}
+              onChange={(e) =>
+                setBookingDate(
+                  e.target.value
+                )
+              }
+              className="w-full bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
+              required
+            />
+
+          </div>
+
+          {/* TIME */}
+          <div>
+
+            <label className="block mb-3 text-zinc-300">
+
+              Preferred Escrow Time
+
+            </label>
+
+            <input
+              type="time"
+              value={bookingTime}
+              onChange={(e) =>
+                setBookingTime(
+                  e.target.value
+                )
+              }
+              className="w-full bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
+              required
+            />
+
+          </div>
+
+          {/* KYC NOTICE */}
+          <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-5 text-yellow-300 text-sm leading-7">
+
+            ⚠ All traders must
+            complete manual KYC
+            verification before escrow
+            approval.
+
+          </div>
+
+          {/* FEE NOTICE */}
+          <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-5 text-center text-yellow-300 font-bold text-sm leading-7">
+
+            🔥 ESCROW FEES —
+            BELOW 500 USDT → 2%
+            EACH SIDE •
+            500–5000 USDT → 1%
+            EACH SIDE •
+            5000+ USDT →
+            0.5% EACH SIDE 🔥
+
+          </div>
+
+          {/* CALCULATIONS */}
+          <div className="bg-zinc-800 border border-zinc-700 rounded-2xl p-6 space-y-4">
+
+            <div className="flex justify-between">
+
+              <span>
+                Fee Rate
+              </span>
+
+              <span>
+                {feeRate}%
+              </span>
+
             </div>
 
-            <h1 className="text-4xl font-bold mb-4">
-              Escrow Calculator
-            </h1>
+            <div className="flex justify-between">
 
-            <div className="text-zinc-400">
-              Create secure escrow deals
-              with automatic fee
-              calculation.
+              <span>
+                Escrow Fee
+              </span>
+
+              <span>
+
+                {feeAmount.toFixed(
+                  2
+                )}{" "}
+                USDT
+
+              </span>
+
+            </div>
+
+            <div className="flex justify-between">
+
+              <span>
+                Seller Deposit
+              </span>
+
+              <span>
+
+                {sellerDeposit.toFixed(
+                  2
+                )}{" "}
+                USDT
+
+              </span>
+
+            </div>
+
+            <div className="flex justify-between">
+
+              <span>
+                Buyer Receives
+              </span>
+
+              <span>
+
+                {buyerReceives.toFixed(
+                  2
+                )}{" "}
+                USDT
+
+              </span>
+
             </div>
 
           </div>
 
-          {/* FORM */}
-          <form
-            onSubmit={
-              handleCreateOrder
-            }
-            className="space-y-6"
+          {/* BUTTON */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-yellow-400 hover:bg-yellow-300 text-black font-bold py-5 rounded-2xl transition-all text-lg"
           >
 
-            {/* AMOUNT */}
-            <div>
+            {loading
+              ? "Creating Escrow..."
+              : "Create Escrow Deal"}
 
-              <label className="block mb-3 text-zinc-300">
-                Transaction Amount
-                (USDT)
-              </label>
+          </button>
 
-              <input
-                type="number"
-                required
-                value={amount}
-                onChange={(e) =>
-                  setAmount(
-                    e.target.value
-                  )
-                }
-                placeholder="Enter amount"
-                className="w-full bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
-              />
-
-            </div>
-
-            {/* TELEGRAM */}
-            <div>
-
-              <label className="block mb-3 text-zinc-300">
-                Telegram Username
-              </label>
-
-              <input
-                type="text"
-                required
-                value={telegram}
-                onChange={(e) =>
-                  setTelegram(
-                    e.target.value
-                  )
-                }
-                placeholder="@yourtelegram"
-                className="w-full bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
-              />
-
-            </div>
-
-            {/* DATE */}
-            <div>
-
-              <label className="block mb-3 text-zinc-300">
-                Preferred Escrow Date
-              </label>
-
-              <input
-                type="date"
-                required
-                value={bookingDate}
-                onChange={(e) =>
-                  setBookingDate(
-                    e.target.value
-                  )
-                }
-                className="w-full bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
-              />
-
-            </div>
-
-            {/* TIME */}
-            <div>
-
-              <label className="block mb-3 text-zinc-300">
-                Preferred Escrow Time
-              </label>
-
-              <input
-                type="time"
-                required
-                value={bookingTime}
-                onChange={(e) =>
-                  setBookingTime(
-                    e.target.value
-                  )
-                }
-                className="w-full bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
-              />
-
-            </div>
-
-            {/* KYC NOTICE */}
-            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-5 text-yellow-300 text-sm">
-
-              ⚠ All traders must
-              complete manual KYC
-              verification before escrow
-              approval.
-
-            </div>
-
-            {/* FEE NOTICE */}
-            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-5 text-center text-yellow-300 font-bold text-sm leading-7">
-
-              🔥 ESCROW FEES — BELOW
-              500 USDT → 2% EACH SIDE
-              • 500–5000 USDT → 1%
-              EACH SIDE • 5000+ USDT
-              → 0.5% EACH SIDE 🔥
-
-            </div>
-
-            {/* CALCULATOR */}
-            <div className="bg-zinc-800 border border-zinc-700 rounded-2xl p-6 space-y-4">
-
-              <h2 className="text-2xl font-bold text-yellow-400">
-                Escrow Calculation
-              </h2>
-
-              <div className="flex justify-between">
-
-                <span>Fee Rate</span>
-
-                <span>
-                  {feeRate}%
-                </span>
-
-              </div>
-
-              <div className="flex justify-between">
-
-                <span>Total Fee</span>
-
-                <span>
-                  {totalFee.toFixed(2)}
-                  {" "}USDT
-                </span>
-
-              </div>
-
-              <div className="flex justify-between">
-
-                <span>
-                  Seller Deposit
-                </span>
-
-                <span>
-                  {sellerDeposit.toFixed(
-                    2
-                  )}{" "}
-                  USDT
-                </span>
-
-              </div>
-
-              <div className="flex justify-between">
-
-                <span>
-                  Buyer Receives
-                </span>
-
-                <span>
-                  {buyerReceives.toFixed(
-                    2
-                  )}{" "}
-                  USDT
-                </span>
-
-              </div>
-
-            </div>
-
-            {/* BUTTON */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-yellow-400 hover:bg-yellow-300 text-black font-bold py-4 rounded-2xl transition-all disabled:opacity-50"
-            >
-
-              {loading
-                ? "Creating Escrow..."
-                : "Create Escrow Deal"}
-
-            </button>
-
-            {/* MESSAGE */}
-            {message && (
-
-              <div className="bg-zinc-800 border border-zinc-700 rounded-2xl p-4 text-center">
-                {message}
-              </div>
-
-            )}
-
-          </form>
-
-        </div>
+        </form>
 
       </div>
 
