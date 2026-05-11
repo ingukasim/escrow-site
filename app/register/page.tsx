@@ -33,7 +33,7 @@ export default function RegisterPage() {
 
     try {
 
-      const { data, error } =
+      const { error } =
         await supabase.auth.signUp({
           email,
           password,
@@ -49,7 +49,7 @@ export default function RegisterPage() {
       }
 
       setMessage(
-        "Account created successfully!"
+        "✅ Account created successfully!"
       );
 
       setTimeout(() => {
@@ -61,7 +61,7 @@ export default function RegisterPage() {
       console.error(err);
 
       setMessage(
-        "Registration failed"
+        "❌ Registration failed"
       );
 
     } finally {
@@ -93,8 +93,8 @@ export default function RegisterPage() {
             </h1>
 
             <div className="text-zinc-400">
-              Register to access secure
-              USDT escrow services.
+              Register for verified
+              escrow access.
             </div>
 
           </div>
@@ -172,6 +172,22 @@ export default function RegisterPage() {
             )}
 
           </form>
+
+          {/* LOGIN */}
+          <div className="text-center mt-8 text-zinc-400">
+
+            Already have an account?{" "}
+
+            <button
+              onClick={() =>
+                router.push("/login")
+              }
+              className="text-yellow-400 hover:text-yellow-300"
+            >
+              Login
+            </button>
+
+          </div>
 
         </div>
 
