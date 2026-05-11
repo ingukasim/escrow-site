@@ -20,6 +20,9 @@ export default function OrderPage() {
   const [message, setMessage] =
     useState("");
 
+  const [buyerWallet, setBuyerWallet] =
+    useState("");
+
   useEffect(() => {
 
     loadOrder();
@@ -206,12 +209,12 @@ export default function OrderPage() {
 
         </div>
 
-        {/* WALLET SECTION */}
+        {/* SELLER ESCROW DEPOSIT */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 mb-10">
 
           <h2 className="text-3xl font-bold text-yellow-400 mb-8">
 
-            Escrow Wallet Deposit
+            Seller Escrow Deposit
 
           </h2>
 
@@ -246,7 +249,7 @@ export default function OrderPage() {
               <div>
 
                 <div className="text-zinc-400 mb-2">
-                  Wallet Address
+                  Escrow Wallet Address
                 </div>
 
                 <div className="bg-black border border-zinc-700 rounded-2xl p-5 break-all text-lg">
@@ -257,16 +260,90 @@ export default function OrderPage() {
 
               </div>
 
+              <div>
+
+                <div className="text-zinc-400 mb-2">
+                  Required Deposit
+                </div>
+
+                <div className="text-3xl font-bold text-yellow-400">
+
+                  {order.seller_deposit}
+                  {" "}USDT
+
+                </div>
+
+              </div>
+
               <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-5 text-yellow-300 text-sm leading-7">
 
                 ⚠ Seller must deposit
-                EXACT escrow amount to
-                escrow wallet before
-                buyer payment begins.
+                escrow USDT before buyer
+                payment process begins.
 
               </div>
 
             </div>
+
+          </div>
+
+        </div>
+
+        {/* BUYER SECTION */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 mb-10">
+
+          <h2 className="text-3xl font-bold text-yellow-400 mb-8">
+
+            Buyer Payment Section
+
+          </h2>
+
+          <div className="space-y-6">
+
+            <div>
+
+              <label className="block mb-3 text-zinc-300">
+
+                Buyer Receiving Wallet
+
+              </label>
+
+              <input
+                type="text"
+                value={buyerWallet}
+                onChange={(e) =>
+                  setBuyerWallet(
+                    e.target.value
+                  )
+                }
+                placeholder="Enter your USDT receiving wallet"
+                className="w-full bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
+              />
+
+            </div>
+
+            <div className="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-5 text-blue-300 text-sm leading-7">
+
+              💡 Buyer must provide a
+              correct USDT receiving
+              wallet before escrow
+              release.
+
+            </div>
+
+            {order.status ===
+              "Pending" && (
+
+              <button
+                onClick={markAsPaid}
+                className="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-10 py-4 rounded-2xl transition-all"
+              >
+
+                I Have Paid
+
+              </button>
+
+            )}
 
           </div>
 
@@ -350,39 +427,6 @@ export default function OrderPage() {
           </div>
 
         </div>
-
-        {/* BUYER ACTION */}
-        {order.status ===
-          "Pending" && (
-
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 text-center">
-
-            <h2 className="text-3xl font-bold mb-5">
-
-              Buyer Payment Action
-
-            </h2>
-
-            <div className="text-zinc-400 mb-8">
-
-              After sending payment,
-              click below to notify
-              escrow admin.
-
-            </div>
-
-            <button
-              onClick={markAsPaid}
-              className="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-10 py-4 rounded-2xl transition-all"
-            >
-
-              I Have Paid
-
-            </button>
-
-          </div>
-
-        )}
 
         {/* MESSAGE */}
         {message && (
