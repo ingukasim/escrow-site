@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Navbar from "./components/Navbar";
 
 export default function Home() {
   const [amount, setAmount] = useState("");
@@ -22,6 +23,8 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-black text-white">
 
+      <Navbar />
+
       {/* TOP ANNOUNCEMENT */}
       <div className="bg-yellow-400 text-black py-3 border-b border-yellow-300">
         <div className="animate-pulse text-center font-bold text-sm lg:text-base px-4">
@@ -33,6 +36,7 @@ export default function Home() {
 
       {/* HERO */}
       <section className="border-b border-zinc-800 bg-gradient-to-b from-zinc-950 to-black">
+
         <div className="max-w-7xl mx-auto px-6 py-20">
 
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -60,13 +64,20 @@ export default function Home() {
               {/* BUTTONS */}
               <div className="flex flex-wrap gap-4 mt-8">
 
-                <button className="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-8 py-4 rounded-2xl transition-all">
+                <a
+                  href="/register"
+                  className="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-8 py-4 rounded-2xl transition-all"
+                >
                   Open Escrow
-                </button>
+                </a>
 
-                <button className="border border-zinc-700 hover:border-yellow-400 hover:text-yellow-400 px-8 py-4 rounded-2xl transition-all">
+                <a
+                  href="https://t.me/TeathorUSTD"
+                  target="_blank"
+                  className="border border-zinc-700 hover:border-yellow-400 hover:text-yellow-400 px-8 py-4 rounded-2xl transition-all"
+                >
                   Join Telegram
-                </button>
+                </a>
 
               </div>
 
@@ -215,72 +226,17 @@ export default function Home() {
                 </div>
 
                 {/* BUTTON */}
-                <button className="w-full bg-yellow-400 hover:bg-yellow-300 text-black font-bold py-4 rounded-2xl text-lg transition-all">
+                <a
+                  href="/register"
+                  className="block text-center w-full bg-yellow-400 hover:bg-yellow-300 text-black font-bold py-4 rounded-2xl text-lg transition-all"
+                >
                   Create Escrow Deal
-                </button>
+                </a>
 
               </div>
 
             </div>
 
-          </div>
-
-        </div>
-      </section>
-
-      {/* TRUST SECTION */}
-      <section className="max-w-7xl mx-auto px-6 py-20">
-
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold">
-            Why Traders Trust Our Platform
-          </h2>
-
-          <p className="text-zinc-400 mt-4 text-lg">
-            Professional crypto escrow system built for trusted OTC trading.
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 hover:border-yellow-400 transition-all">
-            <h3 className="text-xl font-bold text-yellow-400 mb-3">
-              Manual KYC
-            </h3>
-
-            <p className="text-zinc-400">
-              Every member is manually verified before escrow access approval.
-            </p>
-          </div>
-
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 hover:border-yellow-400 transition-all">
-            <h3 className="text-xl font-bold text-yellow-400 mb-3">
-              Verified Traders
-            </h3>
-
-            <p className="text-zinc-400">
-              Trusted member community with identity verification system.
-            </p>
-          </div>
-
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 hover:border-yellow-400 transition-all">
-            <h3 className="text-xl font-bold text-yellow-400 mb-3">
-              Secure Escrow
-            </h3>
-
-            <p className="text-zinc-400">
-              USDT held securely until payment confirmation is completed.
-            </p>
-          </div>
-
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 hover:border-yellow-400 transition-all">
-            <h3 className="text-xl font-bold text-yellow-400 mb-3">
-              24/7 Support
-            </h3>
-
-            <p className="text-zinc-400">
-              Fast admin support and manual dispute handling assistance.
-            </p>
           </div>
 
         </div>
