@@ -110,7 +110,7 @@ export default function OrderPage() {
 
       <Navbar />
 
-      <div className="max-w-4xl mx-auto px-6 py-20">
+      <div className="max-w-5xl mx-auto px-6 py-20">
 
         {/* HEADER */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 mb-10">
@@ -162,6 +162,109 @@ export default function OrderPage() {
                 </div>
 
               )}
+
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* ESCROW STATUS */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 mb-10">
+
+          <h2 className="text-3xl font-bold text-yellow-400 mb-6">
+
+            Escrow Custody Status
+
+          </h2>
+
+          <div className="space-y-4 text-lg">
+
+            <div>
+              ✅ Escrow order created
+            </div>
+
+            <div>
+              ⏳ Awaiting seller USDT
+              deposit
+            </div>
+
+            <div>
+              ⏳ Waiting escrow admin
+              confirmation
+            </div>
+
+            <div>
+              ⏳ Buyer payment pending
+            </div>
+
+            <div>
+              ⏳ Escrow release pending
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* WALLET SECTION */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 mb-10">
+
+          <h2 className="text-3xl font-bold text-yellow-400 mb-8">
+
+            Escrow Wallet Deposit
+
+          </h2>
+
+          <div className="grid md:grid-cols-2 gap-10 items-center">
+
+            {/* QR */}
+            <div className="bg-white rounded-3xl p-6 flex items-center justify-center">
+
+              <img
+                src="/wallet-qr.png"
+                alt="Wallet QR"
+                className="w-64 h-64 object-contain"
+              />
+
+            </div>
+
+            {/* WALLET DETAILS */}
+            <div className="space-y-6">
+
+              <div>
+
+                <div className="text-zinc-400 mb-2">
+                  Network
+                </div>
+
+                <div className="text-2xl font-bold">
+                  TRC20 (TRON)
+                </div>
+
+              </div>
+
+              <div>
+
+                <div className="text-zinc-400 mb-2">
+                  Wallet Address
+                </div>
+
+                <div className="bg-black border border-zinc-700 rounded-2xl p-5 break-all text-lg">
+
+                  YOUR_USDT_WALLET_ADDRESS
+
+                </div>
+
+              </div>
+
+              <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-5 text-yellow-300 text-sm leading-7">
+
+                ⚠ Seller must deposit
+                EXACT escrow amount to
+                escrow wallet before
+                buyer payment begins.
+
+              </div>
 
             </div>
 
@@ -255,14 +358,16 @@ export default function OrderPage() {
           <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 text-center">
 
             <h2 className="text-3xl font-bold mb-5">
+
               Buyer Payment Action
+
             </h2>
 
             <div className="text-zinc-400 mb-8">
 
               After sending payment,
-              click the button below
-              to notify escrow admin.
+              click below to notify
+              escrow admin.
 
             </div>
 
