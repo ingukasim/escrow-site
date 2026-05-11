@@ -1,237 +1,243 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
 import Navbar from "./components/Navbar";
+import { useState } from "react";
 
-export default function Home() {
-  const [amount, setAmount] = useState("");
+export default function HomePage() {
 
-  const usdt = Number(amount) || 0;
+  const [amount, setAmount] =
+    useState("");
 
-  let feePercent = 2;
+  const amountNumber =
+    Number(amount || 0);
 
-  if (usdt >= 500 && usdt <= 5000) {
-    feePercent = 1;
-  } else if (usdt > 5000) {
-    feePercent = 0.5;
+  let feeRate = 0;
+
+  if (amountNumber < 500) {
+    feeRate = 2;
+  } else if (
+    amountNumber >= 500 &&
+    amountNumber <= 5000
+  ) {
+    feeRate = 1;
+  } else {
+    feeRate = 0.5;
   }
 
-  const totalFee = (usdt * feePercent) / 100;
-  const sellerDeposit = usdt + totalFee / 2;
-  const buyerReceive = usdt - totalFee / 2;
+  const totalFee =
+    (amountNumber * feeRate) / 100;
+
+  const sellerDeposit =
+    amountNumber + totalFee;
+
+  const buyerReceives =
+    amountNumber - totalFee;
 
   return (
     <div className="min-h-screen bg-black text-white">
 
       <Navbar />
 
-      {/* TOP ANNOUNCEMENT */}
-      <div className="bg-yellow-400 text-black py-3 border-b border-yellow-300">
-        <div className="animate-pulse text-center font-bold text-sm lg:text-base px-4">
-          🔥 ESCROW FEES — BELOW 500 USDT → 2% EACH SIDE •
-          500–5000 USDT → 1% EACH SIDE •
-          5000+ USDT → 0.5% EACH SIDE 🔥
-        </div>
-      </div>
-
       {/* HERO */}
-      <section className="border-b border-zinc-800 bg-gradient-to-b from-zinc-950 to-black">
+      <section className="max-w-7xl mx-auto px-6 py-24">
 
-        <div className="max-w-7xl mx-auto px-6 py-20">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
 
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          {/* LEFT */}
+          <div>
 
-            {/* LEFT SIDE */}
-            <div>
+            <div className="inline-flex items-center gap-3 bg-yellow-500/10 border border-yellow-500/30 px-5 py-3 rounded-2xl text-yellow-300 text-sm mb-8">
 
-              <div className="inline-flex items-center rounded-full border border-yellow-500/30 bg-yellow-500/10 px-4 py-2 text-yellow-400 text-sm mb-6">
-                Verified OTC Escrow Platform
-              </div>
-
-              <h1 className="text-5xl lg:text-6xl font-bold leading-tight">
-                Secure USDT Escrow
-                <span className="block text-yellow-400 mt-2">
-                  For Verified Traders
-                </span>
-              </h1>
-
-              <p className="text-zinc-400 mt-6 text-lg leading-relaxed">
-                Professional crypto escrow platform with manual KYC verification,
-                trusted member access, secure escrow protection, and live
-                transaction support for buyers and sellers.
-              </p>
-
-              {/* BUTTONS */}
-              <div className="flex flex-wrap gap-4 mt-8">
-
-                <a
-                  href="/register"
-                  className="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-8 py-4 rounded-2xl transition-all"
-                >
-                  Open Escrow
-                </a>
-
-                <a
-                  href="https://t.me/TeathorUSTD"
-                  target="_blank"
-                  className="border border-zinc-700 hover:border-yellow-400 hover:text-yellow-400 px-8 py-4 rounded-2xl transition-all"
-                >
-                  Join Telegram
-                </a>
-
-              </div>
-
-              {/* STATS */}
-              <div className="grid grid-cols-3 gap-6 mt-12">
-
-                <div>
-                  <div className="text-3xl font-bold text-yellow-400">
-                    100%
-                  </div>
-
-                  <div className="text-zinc-400 text-sm mt-1">
-                    Manual Verification
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-3xl font-bold text-yellow-400">
-                    24/7
-                  </div>
-
-                  <div className="text-zinc-400 text-sm mt-1">
-                    Escrow Support
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-3xl font-bold text-yellow-400">
-                    Secure
-                  </div>
-
-                  <div className="text-zinc-400 text-sm mt-1">
-                    USDT Protection
-                  </div>
-                </div>
-
-              </div>
+              🔐 Trusted Manual OTC
+              Escrow Platform
 
             </div>
 
-            {/* RIGHT SIDE */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 shadow-2xl">
+            <h1 className="text-6xl font-bold leading-tight mb-8">
 
-              <h2 className="text-3xl font-bold mb-6 text-yellow-400">
-                Escrow Calculator
-              </h2>
+              Secure USDT
+              <span className="text-yellow-400">
+                {" "}Escrow
+              </span>
+              {" "}Protection
 
-              <div className="space-y-5">
+            </h1>
 
-                {/* AMOUNT */}
-                <div>
-                  <label className="text-sm text-zinc-400">
-                    Transaction Amount (USDT)
-                  </label>
+            <p className="text-zinc-400 text-xl leading-9 mb-10">
 
-                  <input
-                    type="number"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    placeholder="Enter amount"
-                    className="w-full mt-2 bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
-                  />
-                </div>
+              Safe peer-to-peer OTC
+              escrow transactions with
+              manual verification,
+              Telegram support, and
+              secure USDT holding.
 
-                {/* BUYER TELEGRAM */}
-                <div>
-                  <label className="text-sm text-zinc-400">
-                    Buyer Telegram Username
-                  </label>
+            </p>
 
-                  <input
-                    type="text"
-                    placeholder="@buyerusername"
-                    className="w-full mt-2 bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
-                  />
-                </div>
+            <div className="flex flex-wrap gap-5">
 
-                {/* SELLER TELEGRAM */}
-                <div>
-                  <label className="text-sm text-zinc-400">
-                    Seller Telegram Username
-                  </label>
+              <Link
+                href="/register"
+                className="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-8 py-4 rounded-2xl transition-all"
+              >
+                Get Started
+              </Link>
 
-                  <input
-                    type="text"
-                    placeholder="@sellerusername"
-                    className="w-full mt-2 bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
-                  />
-                </div>
+              <Link
+                href="/create-order"
+                className="border border-zinc-700 hover:border-yellow-400 px-8 py-4 rounded-2xl transition-all"
+              >
+                Create Escrow
+              </Link>
 
-                {/* DATE */}
-                <div>
-                  <label className="text-sm text-zinc-400">
-                    Escrow Booking Date
-                  </label>
+            </div>
 
-                  <input
-                    type="date"
-                    className="w-full mt-2 bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
-                  />
-                </div>
+          </div>
 
-                {/* TIME */}
-                <div>
-                  <label className="text-sm text-zinc-400">
-                    Escrow Booking Time
-                  </label>
+          {/* RIGHT */}
+          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10">
 
-                  <input
-                    type="time"
-                    className="w-full mt-2 bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
-                  />
-                </div>
+            <div className="text-3xl font-bold mb-8 text-yellow-400">
+              Escrow Calculator
+            </div>
 
-                {/* KYC WARNING */}
-                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-4 text-sm text-yellow-300">
-                  ⚠ All traders must complete manual KYC verification before
-                  escrow approval.
-                </div>
+            {/* AMOUNT */}
+            <div className="mb-6">
 
-                {/* RESULTS */}
-                <div className="bg-black rounded-2xl p-5 border border-zinc-800 space-y-4">
+              <label className="block mb-3 text-zinc-300">
+                Transaction Amount
+                (USDT)
+              </label>
 
-                  <div className="flex justify-between">
-                    <span className="text-zinc-400">Fee Rate</span>
-                    <span className="text-yellow-400 font-bold">
-                      {feePercent}%
-                    </span>
-                  </div>
+              <input
+                type="number"
+                value={amount}
+                onChange={(e) =>
+                  setAmount(
+                    e.target.value
+                  )
+                }
+                placeholder="Enter amount"
+                className="w-full bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
+              />
 
-                  <div className="flex justify-between">
-                    <span className="text-zinc-400">Total Fee</span>
-                    <span>{totalFee.toFixed(2)} USDT</span>
-                  </div>
+            </div>
 
-                  <div className="flex justify-between">
-                    <span className="text-zinc-400">Seller Deposit</span>
-                    <span>{sellerDeposit.toFixed(2)} USDT</span>
-                  </div>
+            {/* TELEGRAM */}
+            <div className="mb-6">
 
-                  <div className="flex justify-between">
-                    <span className="text-zinc-400">Buyer Receives</span>
-                    <span>{buyerReceive.toFixed(2)} USDT</span>
-                  </div>
+              <label className="block mb-3 text-zinc-300">
+                Telegram Username
+              </label>
 
-                </div>
+              <input
+                type="text"
+                placeholder="@yourtelegram"
+                className="w-full bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
+              />
 
-                {/* BUTTON */}
-                <a
-                  href="/register"
-                  className="block text-center w-full bg-yellow-400 hover:bg-yellow-300 text-black font-bold py-4 rounded-2xl text-lg transition-all"
-                >
-                  Create Escrow Deal
-                </a>
+            </div>
+
+            {/* DATE */}
+            <div className="mb-6">
+
+              <label className="block mb-3 text-zinc-300">
+                Preferred Escrow Date
+              </label>
+
+              <input
+                type="date"
+                className="w-full bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
+              />
+
+            </div>
+
+            {/* TIME */}
+            <div className="mb-6">
+
+              <label className="block mb-3 text-zinc-300">
+                Preferred Escrow Time
+              </label>
+
+              <input
+                type="time"
+                className="w-full bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
+              />
+
+            </div>
+
+            {/* KYC NOTICE */}
+            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-5 text-yellow-300 text-sm mb-6">
+
+              ⚠ All traders must
+              complete manual KYC
+              verification before escrow
+              approval.
+
+            </div>
+
+            {/* FEE NOTICE */}
+            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-5 text-center text-yellow-300 font-bold text-sm leading-7 mb-6">
+
+              🔥 ESCROW FEES — BELOW
+              500 USDT → 2% EACH SIDE
+              • 500–5000 USDT → 1%
+              EACH SIDE • 5000+ USDT
+              → 0.5% EACH SIDE 🔥
+
+            </div>
+
+            {/* CALCULATION */}
+            <div className="bg-zinc-800 border border-zinc-700 rounded-2xl p-6 space-y-4">
+
+              <div className="flex justify-between">
+
+                <span>Fee Rate</span>
+
+                <span>
+                  {feeRate}%
+                </span>
+
+              </div>
+
+              <div className="flex justify-between">
+
+                <span>Total Fee</span>
+
+                <span>
+                  {totalFee.toFixed(2)}
+                  {" "}USDT
+                </span>
+
+              </div>
+
+              <div className="flex justify-between">
+
+                <span>
+                  Seller Deposit
+                </span>
+
+                <span>
+                  {sellerDeposit.toFixed(
+                    2
+                  )}{" "}
+                  USDT
+                </span>
+
+              </div>
+
+              <div className="flex justify-between">
+
+                <span>
+                  Buyer Receives
+                </span>
+
+                <span>
+                  {buyerReceives.toFixed(
+                    2
+                  )}{" "}
+                  USDT
+                </span>
 
               </div>
 
