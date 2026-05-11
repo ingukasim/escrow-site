@@ -258,13 +258,24 @@ export default function CreateOrderPage() {
 
             </div>
 
-            {/* NOTICE */}
+            {/* KYC NOTICE */}
             <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-5 text-yellow-300 text-sm">
 
               ⚠ All traders must
               complete manual KYC
               verification before escrow
               approval.
+
+            </div>
+
+            {/* FEE NOTICE */}
+            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-5 text-center text-yellow-300 font-bold text-sm leading-7">
+
+              🔥 ESCROW FEES — BELOW
+              500 USDT → 2% EACH SIDE
+              • 500–5000 USDT → 1%
+              EACH SIDE • 5000+ USDT
+              → 0.5% EACH SIDE 🔥
 
             </div>
 
