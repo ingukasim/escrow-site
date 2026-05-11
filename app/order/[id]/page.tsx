@@ -1,162 +1,108 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Navbar from "../../components/Navbar";
 import { supabase } from "../../../lib/supabase";
 
-export default function OrderDetailsPage() {
+export default function OrderPage() {
 
   const params = useParams();
 
-  const router = useRouter();
-
-  const [loading, setLoading] =
-    useState(true);
-
-  const [authorized, setAuthorized] =
-    useState(false);
+  const orderId = params.id as string;
 
   const [order, setOrder] =
     useState<any>(null);
 
-  const [timeLeft, setTimeLeft] =
+  const [loading, setLoading] =
+    useState(true);
+
+  const [message, setMessage] =
     useState("");
 
-  const [expired, setExpired] =
-    useState(false);
-
   useEffect(() => {
-    checkAccess();
+
+    loadOrder();
+
   }, []);
 
-  useEffect(() => {
+  const loadOrder = async () => {
 
-    if (!order?.expires_at) return;
+    try {
 
-    const interval = setInterval(() => {
+      const { data, error } =
+        await supabase
+          .from("orders")
+          .select("*")
+          .eq("id", orderId)
+          .single();
 
-      const now =
-        new Date().getTime();
+      if (error) {
 
-      const expiry =
-        new Date(
-          order.expires_at
-        ).getTime();
+        console.error(error);
 
-      const distance =
-        expiry - now;
+      } else {
 
-      if (distance <= 0) {
+        setOrder(data);
 
-        setExpired(true);
-
-        setTimeLeft("Expired");
-
-        clearInterval(interval);
-
-        return;
       }
 
-      const minutes =
-        Math.floor(
-          (distance %
-            (1000 * 60 * 60)) /
-            (1000 * 60)
-        );
+    } catch (err) {
 
-      const seconds =
-        Math.floor(
-          (distance % (1000 * 60)) /
-            1000
-        );
+      console.error(err);
 
-      setTimeLeft(
-        `${minutes}m ${seconds}s`
+    } finally {
+
+      setLoading(false);
+
+    }
+
+  };
+
+  const markAsPaid = async () => {
+
+    const { error } =
+      await supabase
+        .from("orders")
+        .update({
+          status: "Payment Sent",
+        })
+        .eq("id", orderId);
+
+    if (error) {
+
+      setMessage(error.message);
+
+    } else {
+
+      setMessage(
+        "✅ Payment marked successfully!"
       );
 
-    }, 1000);
+      loadOrder();
 
-    return () =>
-      clearInterval(interval);
-
-  }, [order]);
-
-  const checkAccess = async () => {
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-
-      router.push("/login");
-
-      return;
     }
 
-    const admin =
-      user.email ===
-      "escrowusdt.info@gmail.com";
-
-    const { data, error } =
-      await supabase
-        .from("escrow-orders")
-        .select("*")
-        .eq("order_id", params.id)
-        .single();
-
-    if (error || !data) {
-
-      setLoading(false);
-
-      return;
-    }
-
-    const seller =
-      data.seller_user_id ===
-      user.id;
-
-    const buyer =
-      data.buyer_user_id ===
-      user.id;
-
-    if (
-      !admin &&
-      !seller &&
-      !buyer
-    ) {
-
-      setAuthorized(false);
-
-      setLoading(false);
-
-      return;
-    }
-
-    setAuthorized(true);
-
-    setOrder(data);
-
-    setLoading(false);
   };
 
   if (loading) {
 
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        Loading Escrow...
+        Loading escrow...
       </div>
     );
+
   }
 
-  if (!authorized) {
+  if (!order) {
 
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        Access Denied
+        Escrow order not found.
       </div>
     );
+
   }
 
   return (
@@ -164,7 +110,7 @@ export default function OrderDetailsPage() {
 
       <Navbar />
 
-      <div className="max-w-6xl mx-auto px-6 py-20">
+      <div className="max-w-4xl mx-auto px-6 py-20">
 
         {/* HEADER */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 mb-10">
@@ -174,140 +120,175 @@ export default function OrderDetailsPage() {
             <div>
 
               <div className="text-yellow-400 text-sm mb-3">
-                Secure OTC Escrow
+                Escrow Transaction
               </div>
 
-              <h1 className="text-5xl font-bold">
-                {order.order_id}
+              <h1 className="text-5xl font-bold mb-4">
+                {order.amount} USDT
               </h1>
 
-            </div>
-
-            <div
-              className={`px-6 py-4 rounded-2xl font-bold text-lg ${
-                expired
-                  ? "bg-red-500/10 border border-red-500/30 text-red-400"
-                  : "bg-yellow-500/10 border border-yellow-500/30 text-yellow-300"
-              }`}
-            >
-
-              {expired
-                ? "❌ Escrow Expired"
-                : `⏳ ${timeLeft}`}
+              <div className="text-zinc-400">
+                Order ID: {order.id}
+              </div>
 
             </div>
-
-          </div>
-
-        </div>
-
-        {/* STATUS */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 mb-10">
-
-          <div className="flex flex-wrap items-center justify-between gap-6">
 
             <div>
 
-              <div className="text-zinc-400 mb-3">
-                Current Escrow Status
-              </div>
+              {order.status ===
+              "Completed" ? (
 
-              <div className="text-4xl font-bold text-yellow-400">
-                {order.status}
-              </div>
+                <div className="bg-green-500/10 border border-green-500/30 text-green-400 px-6 py-4 rounded-2xl font-bold">
 
-            </div>
+                  ✅ Completed
 
-            <div className="bg-zinc-800 border border-zinc-700 rounded-2xl px-6 py-4">
+                </div>
 
-              <div className="text-zinc-400 text-sm mb-2">
-                Expires At
-              </div>
+              ) : order.status ===
+                "Payment Sent" ? (
 
-              <div className="font-bold">
-                {new Date(
-                  order.expires_at
-                ).toLocaleString()}
-              </div>
+                <div className="bg-blue-500/10 border border-blue-500/30 text-blue-400 px-6 py-4 rounded-2xl font-bold">
 
-            </div>
+                  💸 Payment Sent
 
-          </div>
+                </div>
 
-        </div>
+              ) : (
 
-        {/* ORDER INFO */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
+                <div className="bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 px-6 py-4 rounded-2xl font-bold">
 
-          <h2 className="text-3xl font-bold text-yellow-400 mb-8">
-            Escrow Details
-          </h2>
+                  ⏳ Pending
 
-          <div className="space-y-6">
+                </div>
 
-            <div className="flex justify-between border-b border-zinc-800 pb-4">
-
-              <span className="text-zinc-400">
-                Seller Telegram
-              </span>
-
-              <span className="font-bold">
-                {order.seller_telegram}
-              </span>
-
-            </div>
-
-            <div className="flex justify-between border-b border-zinc-800 pb-4">
-
-              <span className="text-zinc-400">
-                Amount
-              </span>
-
-              <span className="font-bold">
-                {order.amount} USDT
-              </span>
-
-            </div>
-
-            <div className="flex justify-between border-b border-zinc-800 pb-4">
-
-              <span className="text-zinc-400">
-                Seller Deposit
-              </span>
-
-              <span className="font-bold">
-                {order.seller_deposit} USDT
-              </span>
-
-            </div>
-
-            <div className="flex justify-between border-b border-zinc-800 pb-4">
-
-              <span className="text-zinc-400">
-                Buyer Receives
-              </span>
-
-              <span className="font-bold">
-                {order.buyer_receive} USDT
-              </span>
-
-            </div>
-
-            <div className="flex justify-between">
-
-              <span className="text-zinc-400">
-                Fee Percentage
-              </span>
-
-              <span className="font-bold">
-                {order.fee_percent}%
-              </span>
+              )}
 
             </div>
 
           </div>
 
         </div>
+
+        {/* DETAILS */}
+        <div className="grid md:grid-cols-2 gap-6 mb-10">
+
+          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
+
+            <div className="text-zinc-400 mb-3">
+              Telegram Username
+            </div>
+
+            <div className="text-2xl font-bold">
+              {order.telegram}
+            </div>
+
+          </div>
+
+          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
+
+            <div className="text-zinc-400 mb-3">
+              Fee Rate
+            </div>
+
+            <div className="text-2xl font-bold">
+              {order.fee_rate}%
+            </div>
+
+          </div>
+
+          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
+
+            <div className="text-zinc-400 mb-3">
+              Seller Deposit
+            </div>
+
+            <div className="text-2xl font-bold">
+              {order.seller_deposit}
+              {" "}USDT
+            </div>
+
+          </div>
+
+          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
+
+            <div className="text-zinc-400 mb-3">
+              Buyer Receives
+            </div>
+
+            <div className="text-2xl font-bold">
+              {order.buyer_receives}
+              {" "}USDT
+            </div>
+
+          </div>
+
+          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
+
+            <div className="text-zinc-400 mb-3">
+              Escrow Date
+            </div>
+
+            <div className="text-2xl font-bold">
+              {order.booking_date}
+            </div>
+
+          </div>
+
+          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
+
+            <div className="text-zinc-400 mb-3">
+              Escrow Time
+            </div>
+
+            <div className="text-2xl font-bold">
+              {order.booking_time}
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* BUYER ACTION */}
+        {order.status ===
+          "Pending" && (
+
+          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 text-center">
+
+            <h2 className="text-3xl font-bold mb-5">
+              Buyer Payment Action
+            </h2>
+
+            <div className="text-zinc-400 mb-8">
+
+              After sending payment,
+              click the button below
+              to notify escrow admin.
+
+            </div>
+
+            <button
+              onClick={markAsPaid}
+              className="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-10 py-4 rounded-2xl transition-all"
+            >
+
+              I Have Paid
+
+            </button>
+
+          </div>
+
+        )}
+
+        {/* MESSAGE */}
+        {message && (
+
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 text-center mt-8">
+
+            {message}
+
+          </div>
+
+        )}
 
       </div>
 
