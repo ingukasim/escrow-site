@@ -218,11 +218,20 @@ export default function DashboardPage() {
                   <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
 
                     {/* LEFT */}
-                    <div className="space-y-3">
+                    <div className="space-y-4">
 
-                      <div className="text-2xl font-bold">
+                      <div className="text-3xl font-bold text-yellow-400">
 
-                        {order.amount} USDT
+                        {order.amount}
+                        {" "}USDT
+
+                      </div>
+
+                      <div className="text-zinc-400 break-all">
+
+                        Order ID:
+                        {" "}
+                        {order.id}
 
                       </div>
 
@@ -236,7 +245,7 @@ export default function DashboardPage() {
 
                       <div className="text-zinc-400">
 
-                        Preferred Date:
+                        Escrow Date:
                         {" "}
                         {order.booking_date}
 
@@ -244,7 +253,7 @@ export default function DashboardPage() {
 
                       <div className="text-zinc-400">
 
-                        Preferred Time:
+                        Escrow Time:
                         {" "}
                         {order.booking_time}
 
@@ -255,8 +264,7 @@ export default function DashboardPage() {
                         Seller Deposit:
                         {" "}
                         {order.seller_deposit}
-                        {" "}
-                        USDT
+                        {" "}USDT
 
                       </div>
 
@@ -265,15 +273,14 @@ export default function DashboardPage() {
                         Buyer Receives:
                         {" "}
                         {order.buyer_receives}
-                        {" "}
-                        USDT
+                        {" "}USDT
 
                       </div>
 
                     </div>
 
                     {/* RIGHT */}
-                    <div>
+                    <div className="flex flex-col gap-4 items-start lg:items-end">
 
                       {order.status ===
                       "Completed" ? (
@@ -281,6 +288,15 @@ export default function DashboardPage() {
                         <div className="bg-green-500/10 border border-green-500/30 text-green-400 px-5 py-3 rounded-2xl font-bold">
 
                           ✅ Completed
+
+                        </div>
+
+                      ) : order.status ===
+                        "Payment Sent" ? (
+
+                        <div className="bg-blue-500/10 border border-blue-500/30 text-blue-400 px-5 py-3 rounded-2xl font-bold">
+
+                          💸 Payment Sent
 
                         </div>
 
@@ -293,6 +309,15 @@ export default function DashboardPage() {
                         </div>
 
                       )}
+
+                      <Link
+                        href={`/order/${order.id}`}
+                        className="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-6 py-3 rounded-2xl transition-all"
+                      >
+
+                        View Escrow
+
+                      </Link>
 
                     </div>
 
