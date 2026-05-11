@@ -1,26 +1,182 @@
-const handleRegister = async (e: any) => {
-  e.preventDefault();
+"use client";
 
-  setLoading(true);
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Navbar from "../components/Navbar";
+import { supabase } from "../../lib/supabase";
 
-  try {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
+export default function RegisterPage() {
 
-    if (error) {
-      alert(error.message);
-      return;
+  const router = useRouter();
+
+  const [email, setEmail] =
+    useState("");
+
+  const [password, setPassword] =
+    useState("");
+
+  const [loading, setLoading] =
+    useState(false);
+
+  const [message, setMessage] =
+    useState("");
+
+  const handleRegister = async (
+    e: any
+  ) => {
+
+    e.preventDefault();
+
+    setLoading(true);
+
+    setMessage("");
+
+    try {
+
+      const { data, error } =
+        await supabase.auth.signUp({
+          email,
+          password,
+        });
+
+      if (error) {
+
+        setMessage(error.message);
+
+        setLoading(false);
+
+        return;
+      }
+
+      setMessage(
+        "Account created successfully!"
+      );
+
+      setTimeout(() => {
+        router.push("/login");
+      }, 1500);
+
+    } catch (err) {
+
+      console.error(err);
+
+      setMessage(
+        "Registration failed"
+      );
+
+    } finally {
+
+      setLoading(false);
+
     }
 
-    alert("Account created successfully!");
+  };
 
-    window.location.href = "/login";
-  } catch (err) {
-    console.error(err);
-    alert("Something went wrong");
-  } finally {
-    setLoading(false);
-  }
-};
+  return (
+    <div className="min-h-screen bg-black text-white">
+
+      <Navbar />
+
+      <div className="max-w-md mx-auto px-6 py-24">
+
+        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10">
+
+          {/* HEADER */}
+          <div className="text-center mb-10">
+
+            <div className="text-yellow-400 text-sm mb-3">
+              Secure OTC Escrow
+            </div>
+
+            <h1 className="text-4xl font-bold mb-4">
+              Create Account
+            </h1>
+
+            <div className="text-zinc-400">
+              Register to access secure
+              USDT escrow services.
+            </div>
+
+          </div>
+
+          {/* FORM */}
+          <form
+            onSubmit={handleRegister}
+            className="space-y-6"
+          >
+
+            {/* EMAIL */}
+            <div>
+
+              <label className="block mb-3 text-zinc-300">
+                Email Address
+              </label>
+
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) =>
+                  setEmail(
+                    e.target.value
+                  )
+                }
+                placeholder="example@email.com"
+                className="w-full bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
+              />
+
+            </div>
+
+            {/* PASSWORD */}
+            <div>
+
+              <label className="block mb-3 text-zinc-300">
+                Password
+              </label>
+
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={(e) =>
+                  setPassword(
+                    e.target.value
+                  )
+                }
+                placeholder="Enter password"
+                className="w-full bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
+              />
+
+            </div>
+
+            {/* BUTTON */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-yellow-400 hover:bg-yellow-300 text-black font-bold py-4 rounded-2xl transition-all disabled:opacity-50"
+            >
+
+              {loading
+                ? "Creating Account..."
+                : "Create Account"}
+
+            </button>
+
+            {/* MESSAGE */}
+            {message && (
+
+              <div className="bg-zinc-800 border border-zinc-700 rounded-2xl p-4 text-center">
+                {message}
+              </div>
+
+            )}
+
+          </form>
+
+        </div>
+
+      </div>
+
+    </div>
+  );
+}
