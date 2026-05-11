@@ -1,8 +1,44 @@
 "use client";
 
+import { useState } from "react";
 import Navbar from "../components/Navbar";
+import { supabase } from "../../lib/supabase";
 
 export default function RegisterPage() {
+  const [fullName, setFullName] = useState("");
+  const [telegram, setTelegram] = useState("");
+  const [wallet, setWallet] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+
+  const handleRegister = async () => {
+    setLoading(true);
+    setMessage("");
+
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName,
+          telegram_username: telegram,
+          wallet_address: wallet,
+        },
+      },
+    });
+
+    if (error) {
+      setMessage(error.message);
+    } else {
+      setMessage("Account created successfully!");
+    }
+
+    setLoading(false);
+  };
+
   return (
     <div className="min-h-screen bg-black text-white">
 
@@ -34,6 +70,8 @@ export default function RegisterPage() {
               <input
                 type="text"
                 placeholder="Enter full name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
                 className="w-full mt-2 bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
               />
             </div>
@@ -46,6 +84,8 @@ export default function RegisterPage() {
               <input
                 type="text"
                 placeholder="@username"
+                value={telegram}
+                onChange={(e) => setTelegram(e.target.value)}
                 className="w-full mt-2 bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
               />
             </div>
@@ -58,6 +98,22 @@ export default function RegisterPage() {
               <input
                 type="text"
                 placeholder="Enter USDT wallet address"
+                value={wallet}
+                onChange={(e) => setWallet(e.target.value)}
+                className="w-full mt-2 bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm text-zinc-400">
+                Email Address
+              </label>
+
+              <input
+                type="email"
+                placeholder="Enter email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full mt-2 bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
               />
             </div>
@@ -70,6 +126,8 @@ export default function RegisterPage() {
               <input
                 type="password"
                 placeholder="Create password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full mt-2 bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
               />
             </div>
@@ -78,8 +136,18 @@ export default function RegisterPage() {
               ⚠ Manual KYC verification is required before escrow access approval.
             </div>
 
-            <button className="w-full bg-yellow-400 hover:bg-yellow-300 text-black font-bold py-4 rounded-2xl transition-all">
-              Create Account
+            {message && (
+              <div className="bg-zinc-800 border border-zinc-700 rounded-2xl p-4 text-sm text-center">
+                {message}
+              </div>
+            )}
+
+            <button
+              onClick={handleRegister}
+              disabled={loading}
+              className="w-full bg-yellow-400 hover:bg-yellow-300 text-black font-bold py-4 rounded-2xl transition-all disabled:opacity-50"
+            >
+              {loading ? "Creating Account..." : "Create Account"}
             </button>
 
           </div>
