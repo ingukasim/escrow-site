@@ -1,8 +1,12 @@
 "use client";
 
+import Navbar from "../components/Navbar";
+
 export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-black text-white">
+
+      <Navbar />
 
       {/* TOP BAR */}
       <div className="border-b border-zinc-800 bg-zinc-950">
@@ -64,7 +68,7 @@ export default function DashboardPage() {
             </div>
 
             <div className="text-4xl font-bold text-yellow-400 mt-3">
-              24K
+              24K USDT
             </div>
 
           </div>
@@ -158,7 +162,7 @@ export default function DashboardPage() {
 
         </div>
 
-        {/* KYC STATUS */}
+        {/* VERIFICATION */}
         <div className="mt-12">
 
           <h2 className="text-3xl font-bold mb-6">
