@@ -14,31 +14,27 @@ export default function OrderPage() {
   const [order, setOrder] =
     useState<any>(null);
 
+  const [messages, setMessages] =
+    useState<any[]>([]);
+
+  const [newMessage, setNewMessage] =
+    useState("");
+
   const [loading, setLoading] =
     useState(true);
 
-  const [message, setMessage] =
-    useState("");
-
-  const [buyerWallet, setBuyerWallet] =
-    useState("");
-
-  const [proofFile, setProofFile] =
-    useState<any>(null);
-
   const [currentUser, setCurrentUser] =
     useState<any>(null);
-
-  const [userRole, setUserRole] =
-    useState("");
 
   useEffect(() => {
 
     initializePage();
 
-    /* REALTIME */
+    loadMessages();
 
-    const channel =
+    /* ORDER REALTIME */
+
+    const orderChannel =
       supabase
         .channel(
           `order-${orderId}`
@@ -60,10 +56,39 @@ export default function OrderPage() {
         )
         .subscribe();
 
+    /* CHAT REALTIME */
+
+    const messageChannel =
+      supabase
+        .channel(
+          `messages-${orderId}`
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table:
+              "escrow_messages",
+            filter:
+              `order_id=eq.${orderId}`,
+          },
+          () => {
+
+            loadMessages();
+
+          }
+        )
+        .subscribe();
+
     return () => {
 
       supabase.removeChannel(
-        channel
+        orderChannel
+      );
+
+      supabase.removeChannel(
+        messageChannel
       );
 
     };
@@ -80,317 +105,75 @@ export default function OrderPage() {
 
       setCurrentUser(user);
 
-      if (!user) {
-
-        setLoading(false);
-
-        return;
-      }
-
-      let { data, error } =
+      const { data } =
         await supabase
           .from("orders")
           .select("*")
           .eq("id", orderId)
           .single();
 
-      if (error || !data) {
-
-        console.error(error);
-
-        setLoading(false);
-
-        return;
-      }
-
-      const isAdmin =
-        user.email ===
-        "escrowusdt.info@gmail.com";
-
-      /* AUTO JOIN */
-
-      if (
-        !data.joined_user_id &&
-        data.seller_id !== user.id &&
-        !isAdmin
-      ) {
-
-        const {
-          error: joinError,
-        } =
-          await supabase
-            .from("orders")
-            .update({
-              joined_user_id:
-                user.id,
-            })
-            .eq("id", orderId);
-
-        if (!joinError) {
-
-          data.joined_user_id =
-            user.id;
-
-        }
-
-      }
-
       setOrder(data);
-
-      setBuyerWallet(
-        data.buyer_wallet || ""
-      );
-
-      /* ROLE */
-
-      if (
-        data.seller_id ===
-        user.id
-      ) {
-
-        setUserRole(
-          data.creator_role
-        );
-
-      } else {
-
-        if (
-          data.creator_role ===
-          "seller"
-        ) {
-
-          setUserRole(
-            "buyer"
-          );
-
-        } else {
-
-          setUserRole(
-            "seller"
-          );
-
-        }
-
-      }
 
       setLoading(false);
 
     };
 
-  /* SAVE WALLET */
-
-  const saveBuyerWallet =
+  const loadMessages =
     async () => {
 
-      const { error } =
+      const { data } =
         await supabase
-          .from("orders")
-          .update({
-            buyer_wallet:
-              buyerWallet,
-          })
-          .eq("id", orderId);
+          .from(
+            "escrow_messages"
+          )
+          .select("*")
+          .eq("order_id", orderId)
+          .order(
+            "created_at",
+            {
+              ascending: true,
+            }
+          );
 
-      if (error) {
-
-        setMessage(
-          error.message
-        );
-
-      } else {
-
-        setMessage(
-          "✅ Wallet saved successfully!"
-        );
-
-      }
+      setMessages(data || []);
 
     };
 
-  /* UPLOAD PAYMENT PROOF */
-
-  const uploadProof =
+  const sendMessage =
     async () => {
 
-      if (!proofFile) {
-
-        setMessage(
-          "Select proof image first"
-        );
-
-        return;
-      }
-
-      const fileName =
-        `${Date.now()}-${proofFile.name}`;
-
-      const { error: uploadError } =
-        await supabase.storage
-          .from("payment-proofs")
-          .upload(
-            fileName,
-            proofFile
-          );
-
-      if (uploadError) {
-
-        setMessage(
-          uploadError.message
-        );
+      if (!newMessage.trim()) {
 
         return;
       }
 
       const {
-        data: publicData,
+        data: { user },
       } =
-        supabase.storage
-          .from(
-            "payment-proofs"
-          )
-          .getPublicUrl(
-            fileName
-          );
+        await supabase.auth.getUser();
 
-      const proofUrl =
-        publicData.publicUrl;
-
-      const { error } =
-        await supabase
-          .from("orders")
-          .update({
-            payment_proof:
-              proofUrl,
-          })
-          .eq("id", orderId);
-
-      if (error) {
-
-        setMessage(
-          error.message
-        );
-
-      } else {
-
-        setMessage(
-          "✅ Payment proof uploaded!"
-        );
-
-      }
-
-    };
-
-  /* BUYER PAID */
-
-  const markAsPaid =
-    async () => {
-
-      if (
-        !order.payment_proof
-      ) {
-
-        setMessage(
-          "Upload payment proof first"
-        );
+      if (!user) {
 
         return;
       }
 
-      if (
-        !order.buyer_wallet
-      ) {
+      await supabase
+        .from(
+          "escrow_messages"
+        )
+        .insert([
+          {
+            order_id: orderId,
+            sender_email:
+              user.email,
+            message:
+              newMessage,
+          },
+        ]);
 
-        setMessage(
-          "Save buyer wallet first"
-        );
-
-        return;
-      }
-
-      const { error } =
-        await supabase
-          .from("orders")
-          .update({
-            status:
-              "Payment Sent",
-          })
-          .eq("id", orderId);
-
-      if (error) {
-
-        setMessage(
-          error.message
-        );
-
-      } else {
-
-        setMessage(
-          "✅ Payment submitted!"
-        );
-
-      }
+      setNewMessage("");
 
     };
-
-  const confirmEscrow =
-    async () => {
-
-      const { error } =
-        await supabase
-          .from("orders")
-          .update({
-            status:
-              "Escrow Secured",
-          })
-          .eq("id", orderId);
-
-      if (error) {
-
-        setMessage(
-          error.message
-        );
-
-      } else {
-
-        setMessage(
-          "✅ Escrow secured!"
-        );
-
-      }
-
-    };
-
-  const releaseEscrow =
-    async () => {
-
-      const { error } =
-        await supabase
-          .from("orders")
-          .update({
-            status:
-              "Completed",
-          })
-          .eq("id", orderId);
-
-      if (error) {
-
-        setMessage(
-          error.message
-        );
-
-      } else {
-
-        setMessage(
-          "✅ Escrow released!"
-        );
-
-      }
-
-    };
-
-  const isAdmin =
-    currentUser?.email ===
-    "escrowusdt.info@gmail.com";
 
   if (loading) {
 
@@ -402,289 +185,147 @@ export default function OrderPage() {
 
   }
 
-  if (!order) {
-
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        Escrow not found.
-      </div>
-    );
-
-  }
-
   return (
     <div className="min-h-screen bg-black text-white">
 
       <Navbar />
 
-      <div className="max-w-5xl mx-auto px-6 py-20">
+      <div className="max-w-6xl mx-auto px-6 py-20">
 
         {/* HEADER */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 mb-10">
 
-          <div className="flex flex-wrap items-center justify-between gap-6">
+          <h1 className="text-5xl font-bold text-yellow-400 mb-4">
 
-            <div>
+            {order?.amount}
+            {" "}USDT Escrow
 
-              <div className="text-yellow-400 text-sm mb-3">
-                Escrow Transaction
+          </h1>
+
+          <div className="text-zinc-400">
+
+            Order ID:
+            {" "}
+            {order?.id}
+
+          </div>
+
+        </div>
+
+        {/* CHAT */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden">
+
+          {/* TOP */}
+          <div className="p-8 border-b border-zinc-800">
+
+            <h2 className="text-3xl font-bold text-yellow-400">
+
+              Escrow Chat
+
+            </h2>
+
+          </div>
+
+          {/* MESSAGES */}
+          <div className="h-[500px] overflow-y-auto p-8 space-y-6">
+
+            {messages.length ===
+            0 ? (
+
+              <div className="text-zinc-500 text-center pt-20">
+
+                No messages yet.
+
               </div>
 
-              <h1 className="text-5xl font-bold mb-4">
+            ) : (
 
-                {order.amount}
-                {" "}USDT
+              messages.map(
+                (msg) => (
 
-              </h1>
+                  <div
+                    key={msg.id}
+                    className={`max-w-2xl ${
+                      msg.sender_email ===
+                      currentUser?.email
+                        ? "ml-auto"
+                        : ""
+                    }`}
+                  >
 
-              <div className="text-zinc-400">
-                Order ID: {order.id}
-              </div>
+                    <div
+                      className={`rounded-3xl p-5 ${
+                        msg.sender_email ===
+                        currentUser?.email
+                          ? "bg-yellow-400 text-black"
+                          : "bg-zinc-800 text-white"
+                      }`}
+                    >
 
-            </div>
+                      <div className="text-sm opacity-70 mb-2">
 
-            <div>
+                        {
+                          msg.sender_email
+                        }
 
-              {order.status ===
-              "Completed" ? (
+                      </div>
 
-                <div className="bg-green-500/10 border border-green-500/30 text-green-400 px-6 py-4 rounded-2xl font-bold">
+                      <div className="text-lg leading-7 break-words">
 
-                  ✅ Completed
+                        {msg.message}
 
-                </div>
+                      </div>
 
-              ) : order.status ===
-                "Escrow Secured" ? (
+                    </div>
 
-                <div className="bg-purple-500/10 border border-purple-500/30 text-purple-400 px-6 py-4 rounded-2xl font-bold">
+                    <div className="text-xs text-zinc-500 mt-2 px-2">
 
-                  🔒 Escrow Secured
+                      {new Date(
+                        msg.created_at
+                      ).toLocaleString()}
 
-                </div>
+                    </div>
 
-              ) : order.status ===
-                "Payment Sent" ? (
+                  </div>
 
-                <div className="bg-blue-500/10 border border-blue-500/30 text-blue-400 px-6 py-4 rounded-2xl font-bold">
+                )
+              )
 
-                  💸 Payment Sent
+            )}
 
-                </div>
+          </div>
 
-              ) : (
+          {/* INPUT */}
+          <div className="border-t border-zinc-800 p-6">
 
-                <div className="bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 px-6 py-4 rounded-2xl font-bold">
+            <div className="flex gap-4">
 
-                  ⏳ Pending
+              <input
+                type="text"
+                value={newMessage}
+                onChange={(e) =>
+                  setNewMessage(
+                    e.target.value
+                  )
+                }
+                placeholder="Type escrow message..."
+                className="flex-1 bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
+              />
 
-                </div>
+              <button
+                onClick={sendMessage}
+                className="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-8 rounded-2xl transition-all"
+              >
 
-              )}
+                Send
+
+              </button>
 
             </div>
 
           </div>
 
         </div>
-
-        {/* BUYER VIEW */}
-        {userRole ===
-          "buyer" && (
-
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 mb-10">
-
-            <h2 className="text-3xl font-bold text-yellow-400 mb-8">
-
-              Buyer Payment Section
-
-            </h2>
-
-            <div className="space-y-6">
-
-              <div>
-
-                <div className="text-zinc-400 mb-2">
-                  You Will Receive
-                </div>
-
-                <div className="text-3xl font-bold text-yellow-400">
-
-                  {order.buyer_receives}
-                  {" "}USDT
-
-                </div>
-
-              </div>
-
-              <input
-                type="text"
-                value={buyerWallet}
-                onChange={(e) =>
-                  setBuyerWallet(
-                    e.target.value
-                  )
-                }
-                placeholder="Receiving wallet"
-                className="w-full bg-black border border-zinc-700 rounded-2xl p-4"
-              />
-
-              <button
-                onClick={saveBuyerWallet}
-                className="bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-4 rounded-2xl"
-              >
-
-                Save Wallet
-
-              </button>
-
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) =>
-                  setProofFile(
-                    e.target.files?.[0]
-                  )
-                }
-                className="w-full bg-black border border-zinc-700 rounded-2xl p-4"
-              />
-
-              <button
-                onClick={uploadProof}
-                className="bg-purple-500 hover:bg-purple-400 text-white font-bold px-8 py-4 rounded-2xl"
-              >
-
-                Upload Payment Proof
-
-              </button>
-
-              {order.payment_proof && (
-
-                <img
-                  src={
-                    order.payment_proof
-                  }
-                  alt="Proof"
-                  className="rounded-2xl border border-zinc-700"
-                />
-
-              )}
-
-              {order.status ===
-                "Escrow Secured" && (
-
-                <button
-                  onClick={markAsPaid}
-                  className="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-8 py-4 rounded-2xl"
-                >
-
-                  I Have Paid
-
-                </button>
-
-              )}
-
-            </div>
-
-          </div>
-
-        )}
-
-        {/* ADMIN VIEW */}
-        {isAdmin && (
-
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 mb-10">
-
-            <h2 className="text-3xl font-bold text-yellow-400 mb-8">
-
-              Admin Controls
-
-            </h2>
-
-            <div className="space-y-6">
-
-              {order.buyer_wallet && (
-
-                <div>
-
-                  <div className="text-zinc-400 mb-3">
-                    Buyer Wallet
-                  </div>
-
-                  <div className="bg-black border border-zinc-700 rounded-2xl p-5 break-all">
-
-                    {order.buyer_wallet}
-
-                  </div>
-
-                </div>
-
-              )}
-
-              {order.payment_proof && (
-
-                <div>
-
-                  <div className="text-zinc-400 mb-3">
-                    Payment Proof
-                  </div>
-
-                  <img
-                    src={
-                      order.payment_proof
-                    }
-                    alt="Proof"
-                    className="rounded-2xl border border-zinc-700"
-                  />
-
-                </div>
-
-              )}
-
-              {order.status ===
-                "Pending" && (
-
-                <button
-                  onClick={confirmEscrow}
-                  className="bg-purple-500 hover:bg-purple-400 text-white font-bold px-8 py-4 rounded-2xl"
-                >
-
-                  Confirm USDT Received
-
-                </button>
-
-              )}
-
-              {order.status ===
-                "Payment Sent" && (
-
-                <button
-                  onClick={releaseEscrow}
-                  className="bg-green-500 hover:bg-green-400 text-white font-bold px-8 py-4 rounded-2xl"
-                >
-
-                  Release Escrow
-
-                </button>
-
-              )}
-
-            </div>
-
-          </div>
-
-        )}
-
-        {/* MESSAGE */}
-        {message && (
-
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 text-center">
-
-            {message}
-
-          </div>
-
-        )}
 
       </div>
 
