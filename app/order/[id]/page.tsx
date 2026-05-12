@@ -23,11 +23,26 @@ export default function OrderPage() {
   const [buyerWallet, setBuyerWallet] =
     useState("");
 
+  const [currentUser, setCurrentUser] =
+    useState<any>(null);
+
   useEffect(() => {
 
     loadOrder();
 
+    loadUser();
+
   }, []);
+
+  const loadUser = async () => {
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    setCurrentUser(user);
+
+  };
 
   const loadOrder = async () => {
 
@@ -87,6 +102,62 @@ export default function OrderPage() {
     }
 
   };
+
+  const confirmEscrow = async () => {
+
+    const { error } =
+      await supabase
+        .from("orders")
+        .update({
+          status: "Escrow Secured",
+        })
+        .eq("id", orderId);
+
+    if (error) {
+
+      setMessage(error.message);
+
+    } else {
+
+      setMessage(
+        "✅ Escrow confirmed successfully!"
+      );
+
+      loadOrder();
+
+    }
+
+  };
+
+  const releaseEscrow = async () => {
+
+    const { error } =
+      await supabase
+        .from("orders")
+        .update({
+          status: "Completed",
+        })
+        .eq("id", orderId);
+
+    if (error) {
+
+      setMessage(error.message);
+
+    } else {
+
+      setMessage(
+        "✅ Escrow released successfully!"
+      );
+
+      loadOrder();
+
+    }
+
+  };
+
+  const isAdmin =
+    currentUser?.email ===
+    "escrowusdt.info@gmail.com";
 
   if (loading) {
 
@@ -148,6 +219,15 @@ export default function OrderPage() {
                 </div>
 
               ) : order.status ===
+                "Escrow Secured" ? (
+
+                <div className="bg-purple-500/10 border border-purple-500/30 text-purple-400 px-6 py-4 rounded-2xl font-bold">
+
+                  🔒 Escrow Secured
+
+                </div>
+
+              ) : order.status ===
                 "Payment Sent" ? (
 
                 <div className="bg-blue-500/10 border border-blue-500/30 text-blue-400 px-6 py-4 rounded-2xl font-bold">
@@ -188,21 +268,49 @@ export default function OrderPage() {
             </div>
 
             <div>
-              ⏳ Awaiting seller USDT
-              deposit
+
+              {order.status ===
+              "Escrow Secured" ||
+              order.status ===
+              "Payment Sent" ||
+              order.status ===
+              "Completed"
+                ? "✅ Escrow wallet funded"
+                : "⏳ Awaiting seller deposit"}
+
             </div>
 
             <div>
-              ⏳ Waiting escrow admin
-              confirmation
+
+              {order.status ===
+              "Escrow Secured" ||
+              order.status ===
+              "Payment Sent" ||
+              order.status ===
+              "Completed"
+                ? "✅ Escrow secured by admin"
+                : "⏳ Waiting escrow admin confirmation"}
+
             </div>
 
             <div>
-              ⏳ Buyer payment pending
+
+              {order.status ===
+              "Payment Sent" ||
+              order.status ===
+              "Completed"
+                ? "✅ Buyer payment sent"
+                : "⏳ Buyer payment pending"}
+
             </div>
 
             <div>
-              ⏳ Escrow release pending
+
+              {order.status ===
+              "Completed"
+                ? "✅ Escrow released successfully"
+                : "⏳ Escrow release pending"}
+
             </div>
 
           </div>
@@ -223,7 +331,6 @@ export default function OrderPage() {
 
             <div className="grid md:grid-cols-2 gap-10 items-center">
 
-              {/* QR */}
               <div className="bg-white rounded-3xl p-6 flex items-center justify-center">
 
                 <img
@@ -234,7 +341,6 @@ export default function OrderPage() {
 
               </div>
 
-              {/* WALLET */}
               <div className="space-y-6">
 
                 <div>
@@ -275,14 +381,6 @@ export default function OrderPage() {
                     {" "}USDT
 
                   </div>
-
-                </div>
-
-                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-5 text-yellow-300 text-sm leading-7">
-
-                  ⚠ Seller must deposit
-                  escrow USDT before
-                  buyer payment begins.
 
                 </div>
 
@@ -330,16 +428,8 @@ export default function OrderPage() {
 
               </div>
 
-              <div className="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-5 text-blue-300 text-sm leading-7">
-
-                💡 Buyer must provide
-                correct USDT wallet
-                for escrow release.
-
-              </div>
-
               {order.status ===
-                "Pending" && (
+                "Escrow Secured" && (
 
                 <button
                   onClick={markAsPaid}
@@ -347,6 +437,53 @@ export default function OrderPage() {
                 >
 
                   I Have Paid
+
+                </button>
+
+              )}
+
+            </div>
+
+          </div>
+
+        )}
+
+        {/* ADMIN CONTROLS */}
+        {isAdmin && (
+
+          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 mb-10">
+
+            <h2 className="text-3xl font-bold text-yellow-400 mb-8">
+
+              Admin Escrow Controls
+
+            </h2>
+
+            <div className="flex flex-wrap gap-6">
+
+              {order.status ===
+                "Pending" && (
+
+                <button
+                  onClick={confirmEscrow}
+                  className="bg-purple-500 hover:bg-purple-400 text-white font-bold px-8 py-4 rounded-2xl transition-all"
+                >
+
+                  Confirm USDT Received
+
+                </button>
+
+              )}
+
+              {order.status ===
+                "Payment Sent" && (
+
+                <button
+                  onClick={releaseEscrow}
+                  className="bg-green-500 hover:bg-green-400 text-white font-bold px-8 py-4 rounded-2xl transition-all"
+                >
+
+                  Release Escrow
 
                 </button>
 
@@ -419,18 +556,6 @@ export default function OrderPage() {
             <div className="text-2xl font-bold">
               {order.buyer_receives}
               {" "}USDT
-            </div>
-
-          </div>
-
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
-
-            <div className="text-zinc-400 mb-3">
-              Escrow Date
-            </div>
-
-            <div className="text-2xl font-bold">
-              {order.booking_date}
             </div>
 
           </div>
