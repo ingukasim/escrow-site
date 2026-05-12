@@ -14,17 +14,12 @@ export default function OrderPage() {
   const [order, setOrder] =
     useState<any>(null);
 
-  const [activities, setActivities] =
-    useState<any[]>([]);
-
   const [loading, setLoading] =
     useState(true);
 
   useEffect(() => {
 
     initializePage();
-
-    loadActivities();
 
     /* REALTIME */
 
@@ -50,37 +45,10 @@ export default function OrderPage() {
         )
         .subscribe();
 
-    const activityChannel =
-      supabase
-        .channel(
-          `activity-${orderId}`
-        )
-        .on(
-          "postgres_changes",
-          {
-            event: "*",
-            schema: "public",
-            table:
-              "escrow_activity",
-            filter:
-              `order_id=eq.${orderId}`,
-          },
-          () => {
-
-            loadActivities();
-
-          }
-        )
-        .subscribe();
-
     return () => {
 
       supabase.removeChannel(
         orderChannel
-      );
-
-      supabase.removeChannel(
-        activityChannel
       );
 
     };
@@ -103,27 +71,6 @@ export default function OrderPage() {
 
     };
 
-  const loadActivities =
-    async () => {
-
-      const { data } =
-        await supabase
-          .from(
-            "escrow_activity"
-          )
-          .select("*")
-          .eq("order_id", orderId)
-          .order(
-            "created_at",
-            {
-              ascending: false,
-            }
-          );
-
-      setActivities(data || []);
-
-    };
-
   if (loading) {
 
     return (
@@ -139,29 +86,82 @@ export default function OrderPage() {
 
       <Navbar />
 
-      <div className="max-w-7xl mx-auto px-6 py-20">
+      <div className="max-w-6xl mx-auto px-6 py-20">
 
         {/* HEADER */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 mb-10">
 
-          <h1 className="text-5xl font-bold text-yellow-400 mb-4">
+          <div className="flex flex-wrap items-center justify-between gap-6">
 
-            {order?.amount}
-            {" "}USDT Escrow
+            <div>
 
-          </h1>
+              <div className="text-yellow-400 text-sm mb-3">
+                Escrow Transaction
+              </div>
 
-          <div className="text-zinc-400">
+              <h1 className="text-5xl font-bold mb-4">
 
-            Order ID:
-            {" "}
-            {order?.id}
+                {order?.amount}
+                {" "}USDT
+
+              </h1>
+
+              <div className="text-zinc-400">
+
+                Order ID:
+                {" "}
+                {order?.id}
+
+              </div>
+
+            </div>
+
+            <div>
+
+              {order?.status ===
+              "Completed" ? (
+
+                <div className="bg-green-500/10 border border-green-500/30 text-green-400 px-6 py-4 rounded-2xl font-bold">
+
+                  ✅ Completed
+
+                </div>
+
+              ) : order?.status ===
+                "Escrow Secured" ? (
+
+                <div className="bg-purple-500/10 border border-purple-500/30 text-purple-400 px-6 py-4 rounded-2xl font-bold">
+
+                  🔒 Escrow Secured
+
+                </div>
+
+              ) : order?.status ===
+                "Payment Sent" ? (
+
+                <div className="bg-blue-500/10 border border-blue-500/30 text-blue-400 px-6 py-4 rounded-2xl font-bold">
+
+                  💸 Payment Sent
+
+                </div>
+
+              ) : (
+
+                <div className="bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 px-6 py-4 rounded-2xl font-bold">
+
+                  ⏳ Pending
+
+                </div>
+
+              )}
+
+            </div>
 
           </div>
 
         </div>
 
-        {/* ORDER DETAILS */}
+        {/* ESCROW DETAILS */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 mb-10">
 
           <h2 className="text-3xl font-bold text-yellow-400 mb-8">
@@ -175,40 +175,13 @@ export default function OrderPage() {
             <div>
 
               <div className="text-zinc-400 mb-2">
-                Amount
-              </div>
-
-              <div className="text-2xl font-bold">
-
-                {order?.amount} USDT
-
-              </div>
-
-            </div>
-
-            <div>
-
-              <div className="text-zinc-400 mb-2">
-                Status
-              </div>
-
-              <div className="text-2xl font-bold text-yellow-400">
-
-                {order?.status}
-
-              </div>
-
-            </div>
-
-            <div>
-
-              <div className="text-zinc-400 mb-2">
                 Seller Deposit
               </div>
 
               <div className="text-2xl font-bold">
 
-                {order?.seller_deposit} USDT
+                {order?.seller_deposit}
+                {" "}USDT
 
               </div>
 
@@ -222,7 +195,8 @@ export default function OrderPage() {
 
               <div className="text-2xl font-bold">
 
-                {order?.buyer_receives} USDT
+                {order?.buyer_receives}
+                {" "}USDT
 
               </div>
 
@@ -231,7 +205,7 @@ export default function OrderPage() {
             <div>
 
               <div className="text-zinc-400 mb-2">
-                Telegram
+                Telegram Username
               </div>
 
               <div className="text-xl">
@@ -256,6 +230,34 @@ export default function OrderPage() {
 
             </div>
 
+            <div>
+
+              <div className="text-zinc-400 mb-2">
+                Preferred Time
+              </div>
+
+              <div className="text-xl">
+
+                {order?.preferred_time}
+
+              </div>
+
+            </div>
+
+            <div>
+
+              <div className="text-zinc-400 mb-2">
+                Escrow Status
+              </div>
+
+              <div className="text-xl font-bold text-yellow-400">
+
+                {order?.status}
+
+              </div>
+
+            </div>
+
           </div>
 
         </div>
@@ -263,7 +265,7 @@ export default function OrderPage() {
         {/* PAYMENT PROOF */}
         {order?.payment_proof && (
 
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 mb-10">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10">
 
             <h2 className="text-3xl font-bold text-yellow-400 mb-8">
 
@@ -272,7 +274,9 @@ export default function OrderPage() {
             </h2>
 
             <img
-              src={order.payment_proof}
+              src={
+                order.payment_proof
+              }
               alt="Payment Proof"
               className="rounded-3xl border border-zinc-700"
             />
@@ -280,67 +284,6 @@ export default function OrderPage() {
           </div>
 
         )}
-
-        {/* ACTIVITY LOG */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden">
-
-          <div className="p-8 border-b border-zinc-800">
-
-            <h2 className="text-3xl font-bold text-yellow-400">
-
-              Activity Timeline
-
-            </h2>
-
-          </div>
-
-          <div className="p-6 space-y-5 max-h-[600px] overflow-y-auto">
-
-            {activities.length ===
-            0 ? (
-
-              <div className="text-zinc-500 text-center py-20">
-
-                No activity yet.
-
-              </div>
-
-            ) : (
-
-              activities.map(
-                (activity) => (
-
-                  <div
-                    key={activity.id}
-                    className="bg-zinc-800 rounded-2xl p-5"
-                  >
-
-                    <div className="text-white leading-7">
-
-                      {
-                        activity.activity
-                      }
-
-                    </div>
-
-                    <div className="text-xs text-zinc-500 mt-3">
-
-                      {new Date(
-                        activity.created_at
-                      ).toLocaleString()}
-
-                    </div>
-
-                  </div>
-
-                )
-              )
-
-            )}
-
-          </div>
-
-        </div>
 
       </div>
 
