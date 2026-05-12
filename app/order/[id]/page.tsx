@@ -209,148 +209,169 @@ export default function OrderPage() {
 
         </div>
 
-        {/* SELLER ESCROW DEPOSIT */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 mb-10">
+        {/* SELLER VIEW */}
+        {order.role ===
+          "seller" && (
 
-          <h2 className="text-3xl font-bold text-yellow-400 mb-8">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 mb-10">
 
-            Seller Escrow Deposit
+            <h2 className="text-3xl font-bold text-yellow-400 mb-8">
 
-          </h2>
+              Seller Escrow Deposit
 
-          <div className="grid md:grid-cols-2 gap-10 items-center">
+            </h2>
 
-            {/* QR */}
-            <div className="bg-white rounded-3xl p-6 flex items-center justify-center">
+            <div className="grid md:grid-cols-2 gap-10 items-center">
 
-              <img
-                src="/wallet-qr.png"
-                alt="Wallet QR"
-                className="w-64 h-64 object-contain"
-              />
+              {/* QR */}
+              <div className="bg-white rounded-3xl p-6 flex items-center justify-center">
+
+                <img
+                  src="/wallet-qr.png"
+                  alt="Wallet QR"
+                  className="w-64 h-64 object-contain"
+                />
+
+              </div>
+
+              {/* WALLET */}
+              <div className="space-y-6">
+
+                <div>
+
+                  <div className="text-zinc-400 mb-2">
+                    Network
+                  </div>
+
+                  <div className="text-2xl font-bold">
+                    TRC20 (TRON)
+                  </div>
+
+                </div>
+
+                <div>
+
+                  <div className="text-zinc-400 mb-2">
+                    Escrow Wallet Address
+                  </div>
+
+                  <div className="bg-black border border-zinc-700 rounded-2xl p-5 break-all text-lg">
+
+                    YOUR_USDT_WALLET_ADDRESS
+
+                  </div>
+
+                </div>
+
+                <div>
+
+                  <div className="text-zinc-400 mb-2">
+                    Required Deposit
+                  </div>
+
+                  <div className="text-3xl font-bold text-yellow-400">
+
+                    {order.seller_deposit}
+                    {" "}USDT
+
+                  </div>
+
+                </div>
+
+                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-5 text-yellow-300 text-sm leading-7">
+
+                  ⚠ Seller must deposit
+                  escrow USDT before
+                  buyer payment begins.
+
+                </div>
+
+              </div>
 
             </div>
 
-            {/* WALLET DETAILS */}
+          </div>
+
+        )}
+
+        {/* BUYER VIEW */}
+        {order.role ===
+          "buyer" && (
+
+          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 mb-10">
+
+            <h2 className="text-3xl font-bold text-yellow-400 mb-8">
+
+              Buyer Payment Section
+
+            </h2>
+
             <div className="space-y-6">
 
               <div>
 
-                <div className="text-zinc-400 mb-2">
-                  Network
-                </div>
+                <label className="block mb-3 text-zinc-300">
 
-                <div className="text-2xl font-bold">
-                  TRC20 (TRON)
-                </div>
+                  Buyer Receiving Wallet
 
-              </div>
+                </label>
 
-              <div>
-
-                <div className="text-zinc-400 mb-2">
-                  Escrow Wallet Address
-                </div>
-
-                <div className="bg-black border border-zinc-700 rounded-2xl p-5 break-all text-lg">
-
-                  YOUR_USDT_WALLET_ADDRESS
-
-                </div>
+                <input
+                  type="text"
+                  value={buyerWallet}
+                  onChange={(e) =>
+                    setBuyerWallet(
+                      e.target.value
+                    )
+                  }
+                  placeholder="Enter your USDT receiving wallet"
+                  className="w-full bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
+                />
 
               </div>
 
-              <div>
+              <div className="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-5 text-blue-300 text-sm leading-7">
 
-                <div className="text-zinc-400 mb-2">
-                  Required Deposit
-                </div>
-
-                <div className="text-3xl font-bold text-yellow-400">
-
-                  {order.seller_deposit}
-                  {" "}USDT
-
-                </div>
+                💡 Buyer must provide
+                correct USDT wallet
+                for escrow release.
 
               </div>
 
-              <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-5 text-yellow-300 text-sm leading-7">
+              {order.status ===
+                "Pending" && (
 
-                ⚠ Seller must deposit
-                escrow USDT before buyer
-                payment process begins.
+                <button
+                  onClick={markAsPaid}
+                  className="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-10 py-4 rounded-2xl transition-all"
+                >
 
-              </div>
+                  I Have Paid
+
+                </button>
+
+              )}
 
             </div>
 
           </div>
 
-        </div>
-
-        {/* BUYER SECTION */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 mb-10">
-
-          <h2 className="text-3xl font-bold text-yellow-400 mb-8">
-
-            Buyer Payment Section
-
-          </h2>
-
-          <div className="space-y-6">
-
-            <div>
-
-              <label className="block mb-3 text-zinc-300">
-
-                Buyer Receiving Wallet
-
-              </label>
-
-              <input
-                type="text"
-                value={buyerWallet}
-                onChange={(e) =>
-                  setBuyerWallet(
-                    e.target.value
-                  )
-                }
-                placeholder="Enter your USDT receiving wallet"
-                className="w-full bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
-              />
-
-            </div>
-
-            <div className="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-5 text-blue-300 text-sm leading-7">
-
-              💡 Buyer must provide a
-              correct USDT receiving
-              wallet before escrow
-              release.
-
-            </div>
-
-            {order.status ===
-              "Pending" && (
-
-              <button
-                onClick={markAsPaid}
-                className="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-10 py-4 rounded-2xl transition-all"
-              >
-
-                I Have Paid
-
-              </button>
-
-            )}
-
-          </div>
-
-        </div>
+        )}
 
         {/* DETAILS */}
         <div className="grid md:grid-cols-2 gap-6 mb-10">
+
+          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
+
+            <div className="text-zinc-400 mb-3">
+              Role
+            </div>
+
+            <div className="text-2xl font-bold capitalize">
+              {order.role}
+            </div>
+
+          </div>
 
           <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
 
@@ -410,18 +431,6 @@ export default function OrderPage() {
 
             <div className="text-2xl font-bold">
               {order.booking_date}
-            </div>
-
-          </div>
-
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
-
-            <div className="text-zinc-400 mb-3">
-              Escrow Time
-            </div>
-
-            <div className="text-2xl font-bold">
-              {order.booking_time}
             </div>
 
           </div>
