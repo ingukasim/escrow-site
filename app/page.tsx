@@ -7,8 +7,40 @@ import {
   Globe,
   Zap,
 } from "lucide-react";
+import { useState } from "react";
 
 export default function HomePage() {
+
+  const [amount, setAmount] =
+    useState("");
+
+  const usdtAmount =
+    Number(amount) || 0;
+
+  let feeRate = 2;
+
+  if (
+    usdtAmount >= 500 &&
+    usdtAmount <= 5000
+  ) {
+
+    feeRate = 1;
+
+  } else if (
+    usdtAmount > 5000
+  ) {
+
+    feeRate = 0.5;
+
+  }
+
+  const sellerDeposit =
+    usdtAmount +
+    (usdtAmount * feeRate) / 100;
+
+  const buyerReceives =
+    usdtAmount -
+    (usdtAmount * feeRate) / 100;
 
   return (
     <main className="min-h-screen bg-black text-white overflow-hidden relative">
@@ -16,7 +48,7 @@ export default function HomePage() {
       {/* BACKGROUND */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(34,197,94,0.15),transparent_40%)]" />
 
-      {/* FLOATING USDT SYMBOLS */}
+      {/* FLOATING SYMBOLS */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
 
         <div className="absolute top-24 left-10 text-green-500/20 text-8xl animate-bounce">
@@ -70,7 +102,7 @@ export default function HomePage() {
 
       </header>
 
-      {/* HERO SECTION */}
+      {/* HERO */}
       <section className="relative z-10 max-w-7xl mx-auto px-6 py-32">
 
         <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -92,15 +124,18 @@ export default function HomePage() {
               <span className="text-green-400">
                 {" "}USDT
               </span>
+
               <br />
+
               Safely With Escrow
 
             </h1>
 
             <p className="text-zinc-400 text-xl leading-9 mb-10 max-w-2xl">
 
-              Professional crypto escrow platform with realtime transaction tracking,
-              admin verification, secure proof uploads, and protected OTC trading.
+              Professional crypto escrow platform with secure custody,
+              admin verification, realtime escrow updates,
+              and protected OTC trading.
 
             </p>
 
@@ -110,14 +145,18 @@ export default function HomePage() {
                 href="/register"
                 className="bg-green-500 hover:bg-green-400 text-black font-bold px-8 py-5 rounded-2xl text-lg transition"
               >
+
                 Create Escrow
+
               </Link>
 
               <Link
                 href="/login"
                 className="border border-zinc-700 hover:border-green-500 text-white px-8 py-5 rounded-2xl text-lg transition"
               >
+
                 Login
+
               </Link>
 
             </div>
@@ -129,51 +168,65 @@ export default function HomePage() {
 
             <div className="bg-zinc-900 border border-zinc-800 rounded-[40px] p-10 shadow-2xl shadow-green-500/10">
 
-              <div className="flex items-center justify-between mb-8">
+              <div className="mb-8">
 
-                <div>
+                <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/30 text-green-400 px-5 py-2 rounded-full animate-pulse">
 
-                  <div className="text-zinc-400 mb-2">
-                    Escrow Protected
-                  </div>
-
-                  <div className="text-5xl font-black text-green-400">
-
-                    100 USDT
-
-                  </div>
-
-                </div>
-
-                <div className="bg-green-500/10 border border-green-500/30 rounded-3xl p-5">
-
-                  <ShieldCheck
-                    size={50}
-                    className="text-green-400"
-                  />
+                  🔥 LOW FEES FOR LARGE TRANSACTIONS
 
                 </div>
 
               </div>
 
-              <div className="space-y-5">
+              <h2 className="text-4xl font-black mb-8">
+
+                Escrow Fee Calculator
+
+              </h2>
+
+              <div className="space-y-6">
+
+                <div>
+
+                  <div className="text-zinc-400 mb-3">
+
+                    Enter USDT Amount
+
+                  </div>
+
+                  <input
+                    type="number"
+                    placeholder="1000"
+                    value={amount}
+                    onChange={(e) =>
+                      setAmount(
+                        e.target.value
+                      )
+                    }
+                    className="w-full bg-black border border-zinc-700 rounded-2xl p-5 text-2xl outline-none focus:border-green-500"
+                  />
+
+                </div>
 
                 <div className="bg-black border border-zinc-800 rounded-2xl p-5 flex items-center justify-between">
 
                   <div>
 
                     <div className="text-zinc-500 text-sm">
+
                       Seller Deposit
+
                     </div>
 
-                    <div className="text-2xl font-bold">
-                      102 USDT
+                    <div className="text-2xl font-bold text-green-400">
+
+                      {sellerDeposit.toFixed(
+                        2
+                      )}{" "}
+                      USDT
+
                     </div>
 
-                  </div>
-
-                  <div className="text-green-400 font-bold">
-                    +2%
                   </div>
 
                 </div>
@@ -183,26 +236,95 @@ export default function HomePage() {
                   <div>
 
                     <div className="text-zinc-500 text-sm">
+
                       Buyer Receives
+
                     </div>
 
-                    <div className="text-2xl font-bold">
-                      98 USDT
+                    <div className="text-2xl font-bold text-green-400">
+
+                      {buyerReceives.toFixed(
+                        2
+                      )}{" "}
+                      USDT
+
                     </div>
 
-                  </div>
-
-                  <div className="text-red-400 font-bold">
-                    -2%
                   </div>
 
                 </div>
 
-                <div className="bg-green-500/10 border border-green-500/30 rounded-2xl p-5 text-center">
+                <div className="bg-black border border-zinc-800 rounded-2xl p-5 flex items-center justify-between">
 
-                  <div className="text-green-400 font-bold text-xl">
+                  <div>
 
-                    🔒 Escrow Secured
+                    <div className="text-zinc-500 text-sm">
+
+                      Fee Rate
+
+                    </div>
+
+                    <div className="text-2xl font-bold text-yellow-400">
+
+                      {feeRate}%
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+                <div className="bg-green-500/10 border border-green-500/30 rounded-2xl p-5">
+
+                  <div className="space-y-3 text-lg">
+
+                    <div className="flex justify-between">
+
+                      <span>
+
+                        0–500 USDT
+
+                      </span>
+
+                      <span className="text-green-400 font-bold">
+
+                        2%
+
+                      </span>
+
+                    </div>
+
+                    <div className="flex justify-between">
+
+                      <span>
+
+                        500–5000 USDT
+
+                      </span>
+
+                      <span className="text-yellow-400 font-bold">
+
+                        1%
+
+                      </span>
+
+                    </div>
+
+                    <div className="flex justify-between">
+
+                      <span>
+
+                        Above 5000 USDT
+
+                      </span>
+
+                      <span className="text-green-400 font-bold">
+
+                        0.5%
+
+                      </span>
+
+                    </div>
 
                   </div>
 
@@ -254,7 +376,7 @@ export default function HomePage() {
 
             <p className="text-zinc-400 leading-8">
 
-              Escrow funds protected until both parties complete transaction safely.
+              Escrow funds protected until both parties complete safely.
 
             </p>
 
@@ -327,59 +449,6 @@ export default function HomePage() {
 
       </section>
 
-      {/* HOW IT WORKS */}
-      <section className="relative z-10 max-w-7xl mx-auto px-6 py-24">
-
-        <div className="text-center mb-20">
-
-          <div className="text-green-400 font-bold mb-4">
-
-            HOW IT WORKS
-
-          </div>
-
-          <h2 className="text-5xl font-black">
-
-            Simple Escrow Process
-
-          </h2>
-
-        </div>
-
-        <div className="grid md:grid-cols-4 gap-8">
-
-          {[
-            "Create Escrow",
-            "Invite Counterparty",
-            "Upload Payment Proof",
-            "Admin Releases Escrow",
-          ].map((step, index) => (
-
-            <div
-              key={index}
-              className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 text-center"
-            >
-
-              <div className="bg-green-500 text-black w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl font-black">
-
-                {index + 1}
-
-              </div>
-
-              <div className="text-2xl font-bold">
-
-                {step}
-
-              </div>
-
-            </div>
-
-          ))}
-
-        </div>
-
-      </section>
-
       {/* FOOTER */}
       <footer className="relative z-10 border-t border-zinc-800 py-10 mt-20">
 
@@ -394,11 +463,15 @@ export default function HomePage() {
           <div className="flex items-center gap-6 text-zinc-400">
 
             <Link href="/login">
+
               Login
+
             </Link>
 
             <Link href="/register">
+
               Register
+
             </Link>
 
           </div>
