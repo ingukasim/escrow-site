@@ -14,6 +14,9 @@ export default function OrderPage() {
   const [order, setOrder] =
     useState<any>(null);
 
+  const [activities, setActivities] =
+    useState<any[]>([]);
+
   const [messages, setMessages] =
     useState<any[]>([]);
 
@@ -31,6 +34,8 @@ export default function OrderPage() {
     initializePage();
 
     loadMessages();
+
+    loadActivities();
 
     /* ORDER REALTIME */
 
@@ -81,6 +86,31 @@ export default function OrderPage() {
         )
         .subscribe();
 
+    /* ACTIVITY REALTIME */
+
+    const activityChannel =
+      supabase
+        .channel(
+          `activity-${orderId}`
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table:
+              "escrow_activity",
+            filter:
+              `order_id=eq.${orderId}`,
+          },
+          () => {
+
+            loadActivities();
+
+          }
+        )
+        .subscribe();
+
     return () => {
 
       supabase.removeChannel(
@@ -89,6 +119,10 @@ export default function OrderPage() {
 
       supabase.removeChannel(
         messageChannel
+      );
+
+      supabase.removeChannel(
+        activityChannel
       );
 
     };
@@ -139,6 +173,49 @@ export default function OrderPage() {
 
     };
 
+  const loadActivities =
+    async () => {
+
+      const { data } =
+        await supabase
+          .from(
+            "escrow_activity"
+          )
+          .select("*")
+          .eq("order_id", orderId)
+          .order(
+            "created_at",
+            {
+              ascending: false,
+            }
+          );
+
+      setActivities(data || []);
+
+    };
+
+  /* SAVE ACTIVITY */
+
+  const saveActivity =
+    async (
+      activity: string
+    ) => {
+
+      await supabase
+        .from(
+          "escrow_activity"
+        )
+        .insert([
+          {
+            order_id: orderId,
+            activity,
+          },
+        ]);
+
+    };
+
+  /* SEND CHAT */
+
   const sendMessage =
     async () => {
 
@@ -171,6 +248,10 @@ export default function OrderPage() {
           },
         ]);
 
+      await saveActivity(
+        `${user.email} sent a message`
+      );
+
       setNewMessage("");
 
     };
@@ -190,7 +271,7 @@ export default function OrderPage() {
 
       <Navbar />
 
-      <div className="max-w-6xl mx-auto px-6 py-20">
+      <div className="max-w-7xl mx-auto px-6 py-20">
 
         {/* HEADER */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 mb-10">
@@ -212,35 +293,24 @@ export default function OrderPage() {
 
         </div>
 
-        {/* CHAT */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden">
+        <div className="grid lg:grid-cols-3 gap-8">
 
-          {/* TOP */}
-          <div className="p-8 border-b border-zinc-800">
+          {/* CHAT */}
+          <div className="lg:col-span-2 bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden">
 
-            <h2 className="text-3xl font-bold text-yellow-400">
+            <div className="p-8 border-b border-zinc-800">
 
-              Escrow Chat
+              <h2 className="text-3xl font-bold text-yellow-400">
 
-            </h2>
+                Escrow Chat
 
-          </div>
+              </h2>
 
-          {/* MESSAGES */}
-          <div className="h-[500px] overflow-y-auto p-8 space-y-6">
+            </div>
 
-            {messages.length ===
-            0 ? (
+            <div className="h-[600px] overflow-y-auto p-8 space-y-6">
 
-              <div className="text-zinc-500 text-center pt-20">
-
-                No messages yet.
-
-              </div>
-
-            ) : (
-
-              messages.map(
+              {messages.map(
                 (msg) => (
 
                   <div
@@ -270,7 +340,7 @@ export default function OrderPage() {
 
                       </div>
 
-                      <div className="text-lg leading-7 break-words">
+                      <div className="text-lg leading-7">
 
                         {msg.message}
 
@@ -289,37 +359,97 @@ export default function OrderPage() {
                   </div>
 
                 )
-              )
+              )}
 
-            )}
+            </div>
+
+            <div className="border-t border-zinc-800 p-6">
+
+              <div className="flex gap-4">
+
+                <input
+                  type="text"
+                  value={newMessage}
+                  onChange={(e) =>
+                    setNewMessage(
+                      e.target.value
+                    )
+                  }
+                  placeholder="Type escrow message..."
+                  className="flex-1 bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
+                />
+
+                <button
+                  onClick={sendMessage}
+                  className="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-8 rounded-2xl"
+                >
+
+                  Send
+
+                </button>
+
+              </div>
+
+            </div>
 
           </div>
 
-          {/* INPUT */}
-          <div className="border-t border-zinc-800 p-6">
+          {/* ACTIVITY */}
+          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden">
 
-            <div className="flex gap-4">
+            <div className="p-8 border-b border-zinc-800">
 
-              <input
-                type="text"
-                value={newMessage}
-                onChange={(e) =>
-                  setNewMessage(
-                    e.target.value
+              <h2 className="text-3xl font-bold text-yellow-400">
+
+                Activity Log
+
+              </h2>
+
+            </div>
+
+            <div className="p-6 space-y-5 h-[600px] overflow-y-auto">
+
+              {activities.length ===
+              0 ? (
+
+                <div className="text-zinc-500 text-center pt-20">
+
+                  No activity yet.
+
+                </div>
+
+              ) : (
+
+                activities.map(
+                  (activity) => (
+
+                    <div
+                      key={activity.id}
+                      className="bg-zinc-800 rounded-2xl p-5"
+                    >
+
+                      <div className="text-white leading-7">
+
+                        {
+                          activity.activity
+                        }
+
+                      </div>
+
+                      <div className="text-xs text-zinc-500 mt-3">
+
+                        {new Date(
+                          activity.created_at
+                        ).toLocaleString()}
+
+                      </div>
+
+                    </div>
+
                   )
-                }
-                placeholder="Type escrow message..."
-                className="flex-1 bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
-              />
+                )
 
-              <button
-                onClick={sendMessage}
-                className="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-8 rounded-2xl transition-all"
-              >
-
-                Send
-
-              </button>
+              )}
 
             </div>
 
