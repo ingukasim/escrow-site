@@ -36,6 +36,38 @@ export default function OrderPage() {
 
     initializePage();
 
+    /* REALTIME */
+
+    const channel =
+      supabase
+        .channel(
+          `order-${orderId}`
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "orders",
+            filter:
+              `id=eq.${orderId}`,
+          },
+          () => {
+
+            initializePage();
+
+          }
+        )
+        .subscribe();
+
+    return () => {
+
+      supabase.removeChannel(
+        channel
+      );
+
+    };
+
   }, []);
 
   const initializePage =
@@ -171,8 +203,6 @@ export default function OrderPage() {
           "✅ Wallet saved successfully!"
         );
 
-        initializePage();
-
       }
 
     };
@@ -246,8 +276,6 @@ export default function OrderPage() {
           "✅ Payment proof uploaded!"
         );
 
-        initializePage();
-
       }
 
     };
@@ -300,8 +328,6 @@ export default function OrderPage() {
           "✅ Payment submitted!"
         );
 
-        initializePage();
-
       }
 
     };
@@ -329,8 +355,6 @@ export default function OrderPage() {
         setMessage(
           "✅ Escrow secured!"
         );
-
-        initializePage();
 
       }
 
@@ -360,8 +384,6 @@ export default function OrderPage() {
           "✅ Escrow released!"
         );
 
-        initializePage();
-
       }
 
     };
@@ -380,6 +402,16 @@ export default function OrderPage() {
 
   }
 
+  if (!order) {
+
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        Escrow not found.
+      </div>
+    );
+
+  }
+
   return (
     <div className="min-h-screen bg-black text-white">
 
@@ -390,14 +422,68 @@ export default function OrderPage() {
         {/* HEADER */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 mb-10">
 
-          <h1 className="text-5xl font-bold text-yellow-400 mb-4">
+          <div className="flex flex-wrap items-center justify-between gap-6">
 
-            {order.amount} USDT
+            <div>
 
-          </h1>
+              <div className="text-yellow-400 text-sm mb-3">
+                Escrow Transaction
+              </div>
 
-          <div className="text-zinc-400">
-            Order ID: {order.id}
+              <h1 className="text-5xl font-bold mb-4">
+
+                {order.amount}
+                {" "}USDT
+
+              </h1>
+
+              <div className="text-zinc-400">
+                Order ID: {order.id}
+              </div>
+
+            </div>
+
+            <div>
+
+              {order.status ===
+              "Completed" ? (
+
+                <div className="bg-green-500/10 border border-green-500/30 text-green-400 px-6 py-4 rounded-2xl font-bold">
+
+                  ✅ Completed
+
+                </div>
+
+              ) : order.status ===
+                "Escrow Secured" ? (
+
+                <div className="bg-purple-500/10 border border-purple-500/30 text-purple-400 px-6 py-4 rounded-2xl font-bold">
+
+                  🔒 Escrow Secured
+
+                </div>
+
+              ) : order.status ===
+                "Payment Sent" ? (
+
+                <div className="bg-blue-500/10 border border-blue-500/30 text-blue-400 px-6 py-4 rounded-2xl font-bold">
+
+                  💸 Payment Sent
+
+                </div>
+
+              ) : (
+
+                <div className="bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 px-6 py-4 rounded-2xl font-bold">
+
+                  ⏳ Pending
+
+                </div>
+
+              )}
+
+            </div>
+
           </div>
 
         </div>
@@ -416,7 +502,21 @@ export default function OrderPage() {
 
             <div className="space-y-6">
 
-              {/* WALLET */}
+              <div>
+
+                <div className="text-zinc-400 mb-2">
+                  You Will Receive
+                </div>
+
+                <div className="text-3xl font-bold text-yellow-400">
+
+                  {order.buyer_receives}
+                  {" "}USDT
+
+                </div>
+
+              </div>
+
               <input
                 type="text"
                 value={buyerWallet}
@@ -438,7 +538,6 @@ export default function OrderPage() {
 
               </button>
 
-              {/* PAYMENT PROOF */}
               <input
                 type="file"
                 accept="image/*"
@@ -459,20 +558,18 @@ export default function OrderPage() {
 
               </button>
 
-              {/* PREVIEW */}
               {order.payment_proof && (
 
                 <img
                   src={
                     order.payment_proof
                   }
-                  alt="Payment Proof"
+                  alt="Proof"
                   className="rounded-2xl border border-zinc-700"
                 />
 
               )}
 
-              {/* PAID BUTTON */}
               {order.status ===
                 "Escrow Secured" && (
 
@@ -506,7 +603,6 @@ export default function OrderPage() {
 
             <div className="space-y-6">
 
-              {/* BUYER WALLET */}
               {order.buyer_wallet && (
 
                 <div>
@@ -525,7 +621,6 @@ export default function OrderPage() {
 
               )}
 
-              {/* PAYMENT PROOF */}
               {order.payment_proof && (
 
                 <div>
@@ -538,7 +633,7 @@ export default function OrderPage() {
                     src={
                       order.payment_proof
                     }
-                    alt="Payment Proof"
+                    alt="Proof"
                     className="rounded-2xl border border-zinc-700"
                   />
 
@@ -546,7 +641,6 @@ export default function OrderPage() {
 
               )}
 
-              {/* BUTTONS */}
               {order.status ===
                 "Pending" && (
 
