@@ -26,134 +26,210 @@ export default function OrderPage() {
   const [currentUser, setCurrentUser] =
     useState<any>(null);
 
+  const [userRole, setUserRole] =
+    useState("");
+
   useEffect(() => {
 
-    loadOrder();
-
-    loadUser();
+    initializePage();
 
   }, []);
 
-  const loadUser = async () => {
+  const initializePage =
+    async () => {
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } =
+        await supabase.auth.getUser();
 
-    setCurrentUser(user);
+      setCurrentUser(user);
 
-  };
+      if (!user) {
 
-  const loadOrder = async () => {
+        setLoading(false);
 
-    try {
+        return;
+      }
 
-      const { data, error } =
-        await supabase
-          .from("orders")
-          .select("*")
-          .eq("id", orderId)
-          .single();
+      try {
 
-      if (error) {
+        let { data, error } =
+          await supabase
+            .from("orders")
+            .select("*")
+            .eq("id", orderId)
+            .single();
 
-        console.error(error);
+        if (error) {
 
-      } else {
+          console.error(error);
+
+          setLoading(false);
+
+          return;
+        }
+
+        /* AUTO JOIN LOGIC */
+
+        if (
+          !data.joined_user_id &&
+          data.seller_id !== user.id
+        ) {
+
+          const { error: joinError } =
+            await supabase
+              .from("orders")
+              .update({
+                joined_user_id:
+                  user.id,
+              })
+              .eq("id", orderId);
+
+          if (!joinError) {
+
+            data.joined_user_id =
+              user.id;
+
+          }
+
+        }
 
         setOrder(data);
 
+        /* DETECT USER ROLE */
+
+        if (
+          data.seller_id ===
+          user.id
+        ) {
+
+          setUserRole(
+            data.creator_role
+          );
+
+        } else {
+
+          if (
+            data.creator_role ===
+            "seller"
+          ) {
+
+            setUserRole(
+              "buyer"
+            );
+
+          } else {
+
+            setUserRole(
+              "seller"
+            );
+
+          }
+
+        }
+
+      } catch (err) {
+
+        console.error(err);
+
+      } finally {
+
+        setLoading(false);
+
       }
 
-    } catch (err) {
+    };
 
-      console.error(err);
+  const markAsPaid =
+    async () => {
 
-    } finally {
+      const { error } =
+        await supabase
+          .from("orders")
+          .update({
+            status:
+              "Payment Sent",
+          })
+          .eq("id", orderId);
 
-      setLoading(false);
+      if (error) {
 
-    }
+        setMessage(
+          error.message
+        );
 
-  };
+      } else {
 
-  const markAsPaid = async () => {
+        setMessage(
+          "✅ Payment marked successfully!"
+        );
 
-    const { error } =
-      await supabase
-        .from("orders")
-        .update({
-          status: "Payment Sent",
-        })
-        .eq("id", orderId);
+        initializePage();
 
-    if (error) {
+      }
 
-      setMessage(error.message);
+    };
 
-    } else {
+  const confirmEscrow =
+    async () => {
 
-      setMessage(
-        "✅ Payment marked successfully!"
-      );
+      const { error } =
+        await supabase
+          .from("orders")
+          .update({
+            status:
+              "Escrow Secured",
+          })
+          .eq("id", orderId);
 
-      loadOrder();
+      if (error) {
 
-    }
+        setMessage(
+          error.message
+        );
 
-  };
+      } else {
 
-  const confirmEscrow = async () => {
+        setMessage(
+          "✅ Escrow secured successfully!"
+        );
 
-    const { error } =
-      await supabase
-        .from("orders")
-        .update({
-          status: "Escrow Secured",
-        })
-        .eq("id", orderId);
+        initializePage();
 
-    if (error) {
+      }
 
-      setMessage(error.message);
+    };
 
-    } else {
+  const releaseEscrow =
+    async () => {
 
-      setMessage(
-        "✅ Escrow confirmed successfully!"
-      );
+      const { error } =
+        await supabase
+          .from("orders")
+          .update({
+            status:
+              "Completed",
+          })
+          .eq("id", orderId);
 
-      loadOrder();
+      if (error) {
 
-    }
+        setMessage(
+          error.message
+        );
 
-  };
+      } else {
 
-  const releaseEscrow = async () => {
+        setMessage(
+          "✅ Escrow released successfully!"
+        );
 
-    const { error } =
-      await supabase
-        .from("orders")
-        .update({
-          status: "Completed",
-        })
-        .eq("id", orderId);
+        initializePage();
 
-    if (error) {
+      }
 
-      setMessage(error.message);
-
-    } else {
-
-      setMessage(
-        "✅ Escrow released successfully!"
-      );
-
-      loadOrder();
-
-    }
-
-  };
+    };
 
   const isAdmin =
     currentUser?.email ===
@@ -209,42 +285,11 @@ export default function OrderPage() {
 
             <div>
 
-              {order.status ===
-              "Completed" ? (
+              <div className="bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 px-6 py-4 rounded-2xl font-bold capitalize">
 
-                <div className="bg-green-500/10 border border-green-500/30 text-green-400 px-6 py-4 rounded-2xl font-bold">
+                {userRole}
 
-                  ✅ Completed
-
-                </div>
-
-              ) : order.status ===
-                "Escrow Secured" ? (
-
-                <div className="bg-purple-500/10 border border-purple-500/30 text-purple-400 px-6 py-4 rounded-2xl font-bold">
-
-                  🔒 Escrow Secured
-
-                </div>
-
-              ) : order.status ===
-                "Payment Sent" ? (
-
-                <div className="bg-blue-500/10 border border-blue-500/30 text-blue-400 px-6 py-4 rounded-2xl font-bold">
-
-                  💸 Payment Sent
-
-                </div>
-
-              ) : (
-
-                <div className="bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 px-6 py-4 rounded-2xl font-bold">
-
-                  ⏳ Pending
-
-                </div>
-
-              )}
+              </div>
 
             </div>
 
@@ -252,12 +297,12 @@ export default function OrderPage() {
 
         </div>
 
-        {/* ESCROW STATUS */}
+        {/* STATUS */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 mb-10">
 
           <h2 className="text-3xl font-bold text-yellow-400 mb-6">
 
-            Escrow Custody Status
+            Escrow Status
 
           </h2>
 
@@ -275,8 +320,8 @@ export default function OrderPage() {
               "Payment Sent" ||
               order.status ===
               "Completed"
-                ? "✅ Escrow wallet funded"
-                : "⏳ Awaiting seller deposit"}
+                ? "✅ Escrow funded"
+                : "⏳ Awaiting escrow funding"}
 
             </div>
 
@@ -288,8 +333,8 @@ export default function OrderPage() {
               "Payment Sent" ||
               order.status ===
               "Completed"
-                ? "✅ Escrow secured by admin"
-                : "⏳ Waiting escrow admin confirmation"}
+                ? "✅ Escrow secured"
+                : "⏳ Waiting admin confirmation"}
 
             </div>
 
@@ -308,8 +353,8 @@ export default function OrderPage() {
 
               {order.status ===
               "Completed"
-                ? "✅ Escrow released successfully"
-                : "⏳ Escrow release pending"}
+                ? "✅ Escrow completed"
+                : "⏳ Awaiting escrow release"}
 
             </div>
 
@@ -318,18 +363,18 @@ export default function OrderPage() {
         </div>
 
         {/* SELLER VIEW */}
-        {order.role ===
+        {userRole ===
           "seller" && (
 
           <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 mb-10">
 
             <h2 className="text-3xl font-bold text-yellow-400 mb-8">
 
-              Seller Escrow Deposit
+              Seller Deposit Instructions
 
             </h2>
 
-            <div className="grid md:grid-cols-2 gap-10 items-center">
+            <div className="space-y-6">
 
               <div className="bg-white rounded-3xl p-6 flex items-center justify-center">
 
@@ -341,46 +386,42 @@ export default function OrderPage() {
 
               </div>
 
-              <div className="space-y-6">
+              <div>
 
-                <div>
+                <div className="text-zinc-400 mb-2">
+                  Network
+                </div>
 
-                  <div className="text-zinc-400 mb-2">
-                    Network
-                  </div>
+                <div className="text-2xl font-bold">
+                  TRC20 (TRON)
+                </div>
 
-                  <div className="text-2xl font-bold">
-                    TRC20 (TRON)
-                  </div>
+              </div>
+
+              <div>
+
+                <div className="text-zinc-400 mb-2">
+                  Escrow Wallet Address
+                </div>
+
+                <div className="bg-black border border-zinc-700 rounded-2xl p-5 break-all text-lg">
+
+                  YOUR_USDT_WALLET_ADDRESS
 
                 </div>
 
-                <div>
+              </div>
 
-                  <div className="text-zinc-400 mb-2">
-                    Escrow Wallet Address
-                  </div>
+              <div>
 
-                  <div className="bg-black border border-zinc-700 rounded-2xl p-5 break-all text-lg">
-
-                    YOUR_USDT_WALLET_ADDRESS
-
-                  </div>
-
+                <div className="text-zinc-400 mb-2">
+                  Required Deposit
                 </div>
 
-                <div>
+                <div className="text-3xl font-bold text-yellow-400">
 
-                  <div className="text-zinc-400 mb-2">
-                    Required Deposit
-                  </div>
-
-                  <div className="text-3xl font-bold text-yellow-400">
-
-                    {order.seller_deposit}
-                    {" "}USDT
-
-                  </div>
+                  {order.seller_deposit}
+                  {" "}USDT
 
                 </div>
 
@@ -393,7 +434,7 @@ export default function OrderPage() {
         )}
 
         {/* BUYER VIEW */}
-        {order.role ===
+        {userRole ===
           "buyer" && (
 
           <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 mb-10">
@@ -408,9 +449,24 @@ export default function OrderPage() {
 
               <div>
 
+                <div className="text-zinc-400 mb-2">
+                  You Will Receive
+                </div>
+
+                <div className="text-3xl font-bold text-yellow-400">
+
+                  {order.buyer_receives}
+                  {" "}USDT
+
+                </div>
+
+              </div>
+
+              <div>
+
                 <label className="block mb-3 text-zinc-300">
 
-                  Buyer Receiving Wallet
+                  Receiving Wallet
 
                 </label>
 
@@ -422,7 +478,7 @@ export default function OrderPage() {
                       e.target.value
                     )
                   }
-                  placeholder="Enter your USDT receiving wallet"
+                  placeholder="Enter your receiving wallet"
                   className="w-full bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
                 />
 
@@ -455,7 +511,7 @@ export default function OrderPage() {
 
             <h2 className="text-3xl font-bold text-yellow-400 mb-8">
 
-              Admin Escrow Controls
+              Admin Controls
 
             </h2>
 
@@ -495,77 +551,10 @@ export default function OrderPage() {
 
         )}
 
-        {/* DETAILS */}
-        <div className="grid md:grid-cols-2 gap-6 mb-10">
-
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
-
-            <div className="text-zinc-400 mb-3">
-              Role
-            </div>
-
-            <div className="text-2xl font-bold capitalize">
-              {order.role}
-            </div>
-
-          </div>
-
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
-
-            <div className="text-zinc-400 mb-3">
-              Telegram Username
-            </div>
-
-            <div className="text-2xl font-bold">
-              {order.telegram}
-            </div>
-
-          </div>
-
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
-
-            <div className="text-zinc-400 mb-3">
-              Fee Rate
-            </div>
-
-            <div className="text-2xl font-bold">
-              {order.fee_rate}%
-            </div>
-
-          </div>
-
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
-
-            <div className="text-zinc-400 mb-3">
-              Seller Deposit
-            </div>
-
-            <div className="text-2xl font-bold">
-              {order.seller_deposit}
-              {" "}USDT
-            </div>
-
-          </div>
-
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
-
-            <div className="text-zinc-400 mb-3">
-              Buyer Receives
-            </div>
-
-            <div className="text-2xl font-bold">
-              {order.buyer_receives}
-              {" "}USDT
-            </div>
-
-          </div>
-
-        </div>
-
         {/* MESSAGE */}
         {message && (
 
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 text-center mt-8">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 text-center">
 
             {message}
 
