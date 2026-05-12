@@ -17,6 +17,9 @@ export default function OrderPage() {
   const [loading, setLoading] =
     useState(true);
 
+  const [accessDenied, setAccessDenied] =
+    useState(false);
+
   const [message, setMessage] =
     useState("");
 
@@ -49,6 +52,8 @@ export default function OrderPage() {
 
         setLoading(false);
 
+        setAccessDenied(true);
+
         return;
       }
 
@@ -61,23 +66,32 @@ export default function OrderPage() {
             .eq("id", orderId)
             .single();
 
-        if (error) {
+        if (error || !data) {
 
           console.error(error);
 
           setLoading(false);
 
+          setAccessDenied(true);
+
           return;
         }
 
-        /* AUTO JOIN LOGIC */
+        const isAdmin =
+          user.email ===
+          "escrowusdt.info@gmail.com";
+
+        /* AUTO JOIN */
 
         if (
           !data.joined_user_id &&
-          data.seller_id !== user.id
+          data.seller_id !== user.id &&
+          !isAdmin
         ) {
 
-          const { error: joinError } =
+          const {
+            error: joinError,
+          } =
             await supabase
               .from("orders")
               .update({
@@ -95,9 +109,27 @@ export default function OrderPage() {
 
         }
 
+        /* ACCESS CONTROL */
+
+        const hasAccess =
+          data.seller_id ===
+            user.id ||
+          data.joined_user_id ===
+            user.id ||
+          isAdmin;
+
+        if (!hasAccess) {
+
+          setAccessDenied(true);
+
+          setLoading(false);
+
+          return;
+        }
+
         setOrder(data);
 
-        /* DETECT USER ROLE */
+        /* DETECT ROLE */
 
         if (
           data.seller_id ===
@@ -245,6 +277,38 @@ export default function OrderPage() {
 
   }
 
+  if (accessDenied) {
+
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+
+        <div className="bg-zinc-900 border border-red-500/30 rounded-3xl p-12 text-center max-w-lg">
+
+          <div className="text-6xl mb-6">
+            🔒
+          </div>
+
+          <h1 className="text-4xl font-bold text-red-400 mb-4">
+
+            Access Denied
+
+          </h1>
+
+          <div className="text-zinc-400 text-lg">
+
+            You are not authorized
+            to access this escrow
+            transaction.
+
+          </div>
+
+        </div>
+
+      </div>
+    );
+
+  }
+
   if (!order) {
 
     return (
@@ -361,209 +425,7 @@ export default function OrderPage() {
           </div>
 
         </div>
-
-        {/* SELLER VIEW */}
-        {userRole ===
-          "seller" && (
-
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 mb-10">
-
-            <h2 className="text-3xl font-bold text-yellow-400 mb-8">
-
-              Seller Deposit Instructions
-
-            </h2>
-
-            <div className="space-y-6">
-
-              <div className="bg-white rounded-3xl p-6 flex items-center justify-center">
-
-                <img
-                  src="/wallet-qr.png"
-                  alt="Wallet QR"
-                  className="w-64 h-64 object-contain"
-                />
-
-              </div>
-
-              <div>
-
-                <div className="text-zinc-400 mb-2">
-                  Network
-                </div>
-
-                <div className="text-2xl font-bold">
-                  TRC20 (TRON)
-                </div>
-
-              </div>
-
-              <div>
-
-                <div className="text-zinc-400 mb-2">
-                  Escrow Wallet Address
-                </div>
-
-                <div className="bg-black border border-zinc-700 rounded-2xl p-5 break-all text-lg">
-
-                  YOUR_USDT_WALLET_ADDRESS
-
-                </div>
-
-              </div>
-
-              <div>
-
-                <div className="text-zinc-400 mb-2">
-                  Required Deposit
-                </div>
-
-                <div className="text-3xl font-bold text-yellow-400">
-
-                  {order.seller_deposit}
-                  {" "}USDT
-
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        )}
-
-        {/* BUYER VIEW */}
-        {userRole ===
-          "buyer" && (
-
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 mb-10">
-
-            <h2 className="text-3xl font-bold text-yellow-400 mb-8">
-
-              Buyer Payment Section
-
-            </h2>
-
-            <div className="space-y-6">
-
-              <div>
-
-                <div className="text-zinc-400 mb-2">
-                  You Will Receive
-                </div>
-
-                <div className="text-3xl font-bold text-yellow-400">
-
-                  {order.buyer_receives}
-                  {" "}USDT
-
-                </div>
-
-              </div>
-
-              <div>
-
-                <label className="block mb-3 text-zinc-300">
-
-                  Receiving Wallet
-
-                </label>
-
-                <input
-                  type="text"
-                  value={buyerWallet}
-                  onChange={(e) =>
-                    setBuyerWallet(
-                      e.target.value
-                    )
-                  }
-                  placeholder="Enter your receiving wallet"
-                  className="w-full bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
-                />
-
-              </div>
-
-              {order.status ===
-                "Escrow Secured" && (
-
-                <button
-                  onClick={markAsPaid}
-                  className="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-10 py-4 rounded-2xl transition-all"
-                >
-
-                  I Have Paid
-
-                </button>
-
-              )}
-
-            </div>
-
-          </div>
-
-        )}
-
-        {/* ADMIN CONTROLS */}
-        {isAdmin && (
-
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 mb-10">
-
-            <h2 className="text-3xl font-bold text-yellow-400 mb-8">
-
-              Admin Controls
-
-            </h2>
-
-            <div className="flex flex-wrap gap-6">
-
-              {order.status ===
-                "Pending" && (
-
-                <button
-                  onClick={confirmEscrow}
-                  className="bg-purple-500 hover:bg-purple-400 text-white font-bold px-8 py-4 rounded-2xl transition-all"
-                >
-
-                  Confirm USDT Received
-
-                </button>
-
-              )}
-
-              {order.status ===
-                "Payment Sent" && (
-
-                <button
-                  onClick={releaseEscrow}
-                  className="bg-green-500 hover:bg-green-400 text-white font-bold px-8 py-4 rounded-2xl transition-all"
-                >
-
-                  Release Escrow
-
-                </button>
-
-              )}
-
-            </div>
-
-          </div>
-
-        )}
-
-        {/* MESSAGE */}
-        {message && (
-
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 text-center">
-
-            {message}
-
-          </div>
-
-        )}
-
       </div>
-
     </div>
   );
 }
