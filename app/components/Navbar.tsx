@@ -1,64 +1,67 @@
 "use client";
 
-export default function Navbar() {
-  return (
-    <nav className="border-b border-zinc-800 bg-black sticky top-0 z-50">
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { supabase } from "../../lib/supabase";
 
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+export default function Navbar() {
+
+  const router = useRouter();
+
+  const handleLogout = async () => {
+
+    await supabase.auth.signOut();
+
+    router.push("/login");
+
+  };
+
+  return (
+    <nav className="w-full border-b border-zinc-800 bg-black">
+
+      <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
 
         {/* LOGO */}
-        <div className="text-2xl font-bold text-yellow-400">
-          EscrowOTC
-        </div>
+        <Link
+          href="/"
+          className="text-2xl font-bold text-yellow-400"
+        >
+
+          EscrowUSDT
+
+        </Link>
 
         {/* MENU */}
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium">
+        <div className="flex items-center gap-6">
 
-          <a
-            href="/"
-            className="text-zinc-300 hover:text-yellow-400 transition-all"
-          >
-            Home
-          </a>
-
-          <a
+          <Link
             href="/dashboard"
             className="text-zinc-300 hover:text-yellow-400 transition-all"
           >
+
             Dashboard
-          </a>
 
-          <a
-            href="/login"
+          </Link>
+
+          <Link
+            href="/create-order"
             className="text-zinc-300 hover:text-yellow-400 transition-all"
           >
-            Login
-          </a>
 
-          <a
-            href="/register"
-            className="text-zinc-300 hover:text-yellow-400 transition-all"
-          >
-            Register
-          </a>
+            Create Escrow
 
-          <a
-            href="https://t.me/TeathorUSTD"
-            target="_blank"
-            className="text-zinc-300 hover:text-yellow-400 transition-all"
+          </Link>
+
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 hover:bg-red-400 text-white font-bold px-5 py-2 rounded-2xl transition-all"
           >
-            Telegram
-          </a>
+
+            Logout
+
+          </button>
 
         </div>
-
-        {/* BUTTON */}
-        <a
-          href="/"
-          className="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-6 py-3 rounded-2xl transition-all"
-        >
-          Open Escrow
-        </a>
 
       </div>
 
