@@ -19,6 +19,9 @@ export default function DashboardPage() {
   const [loading, setLoading] =
     useState(true);
 
+  const [copiedId, setCopiedId] =
+    useState("");
+
   useEffect(() => {
 
     checkUser();
@@ -54,7 +57,9 @@ export default function DashboardPage() {
         await supabase
           .from("orders")
           .select("*")
-          .eq("seller_id", userId)
+          .or(
+            `seller_id.eq.${userId},joined_user_id.eq.${userId}`
+          )
           .order("created_at", {
             ascending: false,
           });
@@ -81,16 +86,38 @@ export default function DashboardPage() {
 
   };
 
+  const copyInviteLink =
+    async (orderId: string) => {
+
+      const link =
+        `${window.location.origin}/order/${orderId}`;
+
+      await navigator.clipboard.writeText(
+        link
+      );
+
+      setCopiedId(orderId);
+
+      setTimeout(() => {
+
+        setCopiedId("");
+
+      }, 2000);
+
+    };
+
   const pendingOrders =
     orders.filter(
       (o) =>
-        o.status === "Pending"
+        o.status !==
+        "Completed"
     ).length;
 
   const completedOrders =
     orders.filter(
       (o) =>
-        o.status === "Completed"
+        o.status ===
+        "Completed"
     ).length;
 
   return (
@@ -125,7 +152,9 @@ export default function DashboardPage() {
               href="/create-order"
               className="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-8 py-4 rounded-2xl transition-all"
             >
+
               Create New Escrow
+
             </Link>
 
           </div>
@@ -150,7 +179,7 @@ export default function DashboardPage() {
           <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
 
             <div className="text-zinc-400 mb-3">
-              Pending Orders
+              Active Orders
             </div>
 
             <div className="text-5xl font-bold text-yellow-400">
@@ -179,7 +208,9 @@ export default function DashboardPage() {
           <div className="p-8 border-b border-zinc-800">
 
             <h2 className="text-3xl font-bold text-yellow-400">
+
               Escrow Orders
+
             </h2>
 
           </div>
@@ -215,7 +246,7 @@ export default function DashboardPage() {
                   className="p-8 hover:bg-zinc-800/50 transition-all"
                 >
 
-                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
 
                     {/* LEFT */}
                     <div className="space-y-4">
@@ -232,6 +263,14 @@ export default function DashboardPage() {
                         Order ID:
                         {" "}
                         {order.id}
+
+                      </div>
+
+                      <div className="text-zinc-400">
+
+                        Creator Role:
+                        {" "}
+                        {order.creator_role}
 
                       </div>
 
@@ -259,35 +298,27 @@ export default function DashboardPage() {
 
                       </div>
 
-                      <div className="text-zinc-400">
-
-                        Seller Deposit:
-                        {" "}
-                        {order.seller_deposit}
-                        {" "}USDT
-
-                      </div>
-
-                      <div className="text-zinc-400">
-
-                        Buyer Receives:
-                        {" "}
-                        {order.buyer_receives}
-                        {" "}USDT
-
-                      </div>
-
                     </div>
 
                     {/* RIGHT */}
                     <div className="flex flex-col gap-4 items-start lg:items-end">
 
+                      {/* STATUS */}
                       {order.status ===
                       "Completed" ? (
 
                         <div className="bg-green-500/10 border border-green-500/30 text-green-400 px-5 py-3 rounded-2xl font-bold">
 
                           ✅ Completed
+
+                        </div>
+
+                      ) : order.status ===
+                        "Escrow Secured" ? (
+
+                        <div className="bg-purple-500/10 border border-purple-500/30 text-purple-400 px-5 py-3 rounded-2xl font-bold">
+
+                          🔒 Escrow Secured
 
                         </div>
 
@@ -310,14 +341,35 @@ export default function DashboardPage() {
 
                       )}
 
-                      <Link
-                        href={`/order/${order.id}`}
-                        className="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-6 py-3 rounded-2xl transition-all"
-                      >
+                      {/* BUTTONS */}
+                      <div className="flex flex-wrap gap-3">
 
-                        View Escrow
+                        <Link
+                          href={`/order/${order.id}`}
+                          className="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-6 py-3 rounded-2xl transition-all"
+                        >
 
-                      </Link>
+                          View Escrow
+
+                        </Link>
+
+                        <button
+                          onClick={() =>
+                            copyInviteLink(
+                              order.id
+                            )
+                          }
+                          className="bg-blue-500 hover:bg-blue-400 text-white font-bold px-6 py-3 rounded-2xl transition-all"
+                        >
+
+                          {copiedId ===
+                          order.id
+                            ? "Copied!"
+                            : "Copy Invite Link"}
+
+                        </button>
+
+                      </div>
 
                     </div>
 
