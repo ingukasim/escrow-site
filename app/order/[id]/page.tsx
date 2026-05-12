@@ -17,14 +17,14 @@ export default function OrderPage() {
   const [loading, setLoading] =
     useState(true);
 
-  const [accessDenied, setAccessDenied] =
-    useState(false);
-
   const [message, setMessage] =
     useState("");
 
   const [buyerWallet, setBuyerWallet] =
     useState("");
+
+  const [proofFile, setProofFile] =
+    useState<any>(null);
 
   const [currentUser, setCurrentUser] =
     useState<any>(null);
@@ -52,144 +52,103 @@ export default function OrderPage() {
 
         setLoading(false);
 
-        setAccessDenied(true);
+        return;
+      }
+
+      let { data, error } =
+        await supabase
+          .from("orders")
+          .select("*")
+          .eq("id", orderId)
+          .single();
+
+      if (error || !data) {
+
+        console.error(error);
+
+        setLoading(false);
 
         return;
       }
 
-      try {
+      const isAdmin =
+        user.email ===
+        "escrowusdt.info@gmail.com";
 
-        let { data, error } =
+      /* AUTO JOIN */
+
+      if (
+        !data.joined_user_id &&
+        data.seller_id !== user.id &&
+        !isAdmin
+      ) {
+
+        const {
+          error: joinError,
+        } =
           await supabase
             .from("orders")
-            .select("*")
-            .eq("id", orderId)
-            .single();
+            .update({
+              joined_user_id:
+                user.id,
+            })
+            .eq("id", orderId);
 
-        if (error || !data) {
+        if (!joinError) {
 
-          console.error(error);
-
-          setLoading(false);
-
-          setAccessDenied(true);
-
-          return;
-        }
-
-        const isAdmin =
-          user.email ===
-          "escrowusdt.info@gmail.com";
-
-        /* AUTO JOIN */
-
-        if (
-          !data.joined_user_id &&
-          data.seller_id !== user.id &&
-          !isAdmin
-        ) {
-
-          const {
-            error: joinError,
-          } =
-            await supabase
-              .from("orders")
-              .update({
-                joined_user_id:
-                  user.id,
-              })
-              .eq("id", orderId);
-
-          if (!joinError) {
-
-            data.joined_user_id =
-              user.id;
-
-          }
+          data.joined_user_id =
+            user.id;
 
         }
 
-        /* ACCESS CONTROL */
+      }
 
-        const hasAccess =
-          data.seller_id ===
-            user.id ||
-          data.joined_user_id ===
-            user.id ||
-          isAdmin;
+      setOrder(data);
 
-        if (!hasAccess) {
+      setBuyerWallet(
+        data.buyer_wallet || ""
+      );
 
-          setAccessDenied(true);
+      /* ROLE */
 
-          setLoading(false);
+      if (
+        data.seller_id ===
+        user.id
+      ) {
 
-          return;
-        }
-
-        setOrder(data);
-
-        setBuyerWallet(
-          data.buyer_wallet || ""
+        setUserRole(
+          data.creator_role
         );
 
-        /* DETECT ROLE */
+      } else {
 
         if (
-          data.seller_id ===
-          user.id
+          data.creator_role ===
+          "seller"
         ) {
 
           setUserRole(
-            data.creator_role
+            "buyer"
           );
 
         } else {
 
-          if (
-            data.creator_role ===
+          setUserRole(
             "seller"
-          ) {
-
-            setUserRole(
-              "buyer"
-            );
-
-          } else {
-
-            setUserRole(
-              "seller"
-            );
-
-          }
+          );
 
         }
 
-      } catch (err) {
-
-        console.error(err);
-
-      } finally {
-
-        setLoading(false);
-
       }
+
+      setLoading(false);
 
     };
 
-  /* SAVE BUYER WALLET */
+  /* SAVE WALLET */
 
   const saveBuyerWallet =
     async () => {
-
-      if (!buyerWallet) {
-
-        setMessage(
-          "Please enter wallet address"
-        );
-
-        return;
-      }
 
       const { error } =
         await supabase
@@ -209,7 +168,7 @@ export default function OrderPage() {
       } else {
 
         setMessage(
-          "✅ Buyer wallet saved successfully!"
+          "✅ Wallet saved successfully!"
         );
 
         initializePage();
@@ -218,8 +177,107 @@ export default function OrderPage() {
 
     };
 
+  /* UPLOAD PAYMENT PROOF */
+
+  const uploadProof =
+    async () => {
+
+      if (!proofFile) {
+
+        setMessage(
+          "Select proof image first"
+        );
+
+        return;
+      }
+
+      const fileName =
+        `${Date.now()}-${proofFile.name}`;
+
+      const { error: uploadError } =
+        await supabase.storage
+          .from("payment-proofs")
+          .upload(
+            fileName,
+            proofFile
+          );
+
+      if (uploadError) {
+
+        setMessage(
+          uploadError.message
+        );
+
+        return;
+      }
+
+      const {
+        data: publicData,
+      } =
+        supabase.storage
+          .from(
+            "payment-proofs"
+          )
+          .getPublicUrl(
+            fileName
+          );
+
+      const proofUrl =
+        publicData.publicUrl;
+
+      const { error } =
+        await supabase
+          .from("orders")
+          .update({
+            payment_proof:
+              proofUrl,
+          })
+          .eq("id", orderId);
+
+      if (error) {
+
+        setMessage(
+          error.message
+        );
+
+      } else {
+
+        setMessage(
+          "✅ Payment proof uploaded!"
+        );
+
+        initializePage();
+
+      }
+
+    };
+
+  /* BUYER PAID */
+
   const markAsPaid =
     async () => {
+
+      if (
+        !order.payment_proof
+      ) {
+
+        setMessage(
+          "Upload payment proof first"
+        );
+
+        return;
+      }
+
+      if (
+        !order.buyer_wallet
+      ) {
+
+        setMessage(
+          "Save buyer wallet first"
+        );
+
+        return;
+      }
 
       const { error } =
         await supabase
@@ -239,7 +297,7 @@ export default function OrderPage() {
       } else {
 
         setMessage(
-          "✅ Payment marked successfully!"
+          "✅ Payment submitted!"
         );
 
         initializePage();
@@ -269,7 +327,7 @@ export default function OrderPage() {
       } else {
 
         setMessage(
-          "✅ Escrow secured successfully!"
+          "✅ Escrow secured!"
         );
 
         initializePage();
@@ -280,15 +338,6 @@ export default function OrderPage() {
 
   const releaseEscrow =
     async () => {
-
-      if (!order.buyer_wallet) {
-
-        setMessage(
-          "Buyer wallet missing"
-        );
-
-        return;
-      }
 
       const { error } =
         await supabase
@@ -308,7 +357,7 @@ export default function OrderPage() {
       } else {
 
         setMessage(
-          "✅ Escrow released successfully!"
+          "✅ Escrow released!"
         );
 
         initializePage();
@@ -331,48 +380,6 @@ export default function OrderPage() {
 
   }
 
-  if (accessDenied) {
-
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-
-        <div className="bg-zinc-900 border border-red-500/30 rounded-3xl p-12 text-center max-w-lg">
-
-          <div className="text-6xl mb-6">
-            🔒
-          </div>
-
-          <h1 className="text-4xl font-bold text-red-400 mb-4">
-
-            Access Denied
-
-          </h1>
-
-          <div className="text-zinc-400 text-lg">
-
-            You are not authorized
-            to access this escrow
-            transaction.
-
-          </div>
-
-        </div>
-
-      </div>
-    );
-
-  }
-
-  if (!order) {
-
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        Escrow order not found.
-      </div>
-    );
-
-  }
-
   return (
     <div className="min-h-screen bg-black text-white">
 
@@ -383,39 +390,19 @@ export default function OrderPage() {
         {/* HEADER */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 mb-10">
 
-          <div className="flex flex-wrap items-center justify-between gap-6">
+          <h1 className="text-5xl font-bold text-yellow-400 mb-4">
 
-            <div>
+            {order.amount} USDT
 
-              <div className="text-yellow-400 text-sm mb-3">
-                Escrow Transaction
-              </div>
+          </h1>
 
-              <h1 className="text-5xl font-bold mb-4">
-                {order.amount} USDT
-              </h1>
-
-              <div className="text-zinc-400">
-                Order ID: {order.id}
-              </div>
-
-            </div>
-
-            <div>
-
-              <div className="bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 px-6 py-4 rounded-2xl font-bold capitalize">
-
-                {userRole}
-
-              </div>
-
-            </div>
-
+          <div className="text-zinc-400">
+            Order ID: {order.id}
           </div>
 
         </div>
 
-        {/* BUYER SECTION */}
+        {/* BUYER VIEW */}
         {userRole ===
           "buyer" && (
 
@@ -423,12 +410,13 @@ export default function OrderPage() {
 
             <h2 className="text-3xl font-bold text-yellow-400 mb-8">
 
-              Buyer Wallet
+              Buyer Payment Section
 
             </h2>
 
             <div className="space-y-6">
 
+              {/* WALLET */}
               <input
                 type="text"
                 value={buyerWallet}
@@ -437,25 +425,60 @@ export default function OrderPage() {
                     e.target.value
                   )
                 }
-                placeholder="Enter receiving wallet"
-                className="w-full bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
+                placeholder="Receiving wallet"
+                className="w-full bg-black border border-zinc-700 rounded-2xl p-4"
               />
 
               <button
                 onClick={saveBuyerWallet}
-                className="bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-4 rounded-2xl transition-all"
+                className="bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-4 rounded-2xl"
               >
 
                 Save Wallet
 
               </button>
 
+              {/* PAYMENT PROOF */}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) =>
+                  setProofFile(
+                    e.target.files?.[0]
+                  )
+                }
+                className="w-full bg-black border border-zinc-700 rounded-2xl p-4"
+              />
+
+              <button
+                onClick={uploadProof}
+                className="bg-purple-500 hover:bg-purple-400 text-white font-bold px-8 py-4 rounded-2xl"
+              >
+
+                Upload Payment Proof
+
+              </button>
+
+              {/* PREVIEW */}
+              {order.payment_proof && (
+
+                <img
+                  src={
+                    order.payment_proof
+                  }
+                  alt="Payment Proof"
+                  className="rounded-2xl border border-zinc-700"
+                />
+
+              )}
+
+              {/* PAID BUTTON */}
               {order.status ===
                 "Escrow Secured" && (
 
                 <button
                   onClick={markAsPaid}
-                  className="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-8 py-4 rounded-2xl transition-all"
+                  className="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-8 py-4 rounded-2xl"
                 >
 
                   I Have Paid
@@ -471,20 +494,86 @@ export default function OrderPage() {
         )}
 
         {/* ADMIN VIEW */}
-        {isAdmin &&
-          order.buyer_wallet && (
+        {isAdmin && (
 
           <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 mb-10">
 
-            <h2 className="text-3xl font-bold text-yellow-400 mb-6">
+            <h2 className="text-3xl font-bold text-yellow-400 mb-8">
 
-              Buyer Wallet Address
+              Admin Controls
 
             </h2>
 
-            <div className="bg-black border border-zinc-700 rounded-2xl p-5 break-all text-lg">
+            <div className="space-y-6">
 
-              {order.buyer_wallet}
+              {/* BUYER WALLET */}
+              {order.buyer_wallet && (
+
+                <div>
+
+                  <div className="text-zinc-400 mb-3">
+                    Buyer Wallet
+                  </div>
+
+                  <div className="bg-black border border-zinc-700 rounded-2xl p-5 break-all">
+
+                    {order.buyer_wallet}
+
+                  </div>
+
+                </div>
+
+              )}
+
+              {/* PAYMENT PROOF */}
+              {order.payment_proof && (
+
+                <div>
+
+                  <div className="text-zinc-400 mb-3">
+                    Payment Proof
+                  </div>
+
+                  <img
+                    src={
+                      order.payment_proof
+                    }
+                    alt="Payment Proof"
+                    className="rounded-2xl border border-zinc-700"
+                  />
+
+                </div>
+
+              )}
+
+              {/* BUTTONS */}
+              {order.status ===
+                "Pending" && (
+
+                <button
+                  onClick={confirmEscrow}
+                  className="bg-purple-500 hover:bg-purple-400 text-white font-bold px-8 py-4 rounded-2xl"
+                >
+
+                  Confirm USDT Received
+
+                </button>
+
+              )}
+
+              {order.status ===
+                "Payment Sent" && (
+
+                <button
+                  onClick={releaseEscrow}
+                  className="bg-green-500 hover:bg-green-400 text-white font-bold px-8 py-4 rounded-2xl"
+                >
+
+                  Release Escrow
+
+                </button>
+
+              )}
 
             </div>
 
