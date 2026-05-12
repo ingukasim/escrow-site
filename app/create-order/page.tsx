@@ -21,6 +21,9 @@ export default function CreateOrderPage() {
   const [bookingTime, setBookingTime] =
     useState("");
 
+  const [role, setRole] =
+    useState("seller");
+
   const [loading, setLoading] =
     useState(false);
 
@@ -46,7 +49,7 @@ export default function CreateOrderPage() {
 
   }
 
-  /* CORRECT FEE CALCULATION */
+  /* CORRECT ESCROW FEES */
 
   const feeAmount =
     (amountNumber * feeRate) / 100;
@@ -109,6 +112,8 @@ export default function CreateOrderPage() {
 
                 buyer_receives:
                   buyerReceives,
+
+                role,
 
                 status:
                   "Pending",
@@ -181,6 +186,63 @@ export default function CreateOrderPage() {
           }
           className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 space-y-8"
         >
+
+          {/* ROLE */}
+          <div>
+
+            <label className="block mb-4 text-zinc-300 text-lg">
+
+              I Am:
+
+            </label>
+
+            <div className="flex gap-8">
+
+              <label className="flex items-center gap-3 cursor-pointer">
+
+                <input
+                  type="radio"
+                  value="seller"
+                  checked={
+                    role === "seller"
+                  }
+                  onChange={(e) =>
+                    setRole(
+                      e.target.value
+                    )
+                  }
+                />
+
+                <span>
+                  Seller
+                </span>
+
+              </label>
+
+              <label className="flex items-center gap-3 cursor-pointer">
+
+                <input
+                  type="radio"
+                  value="buyer"
+                  checked={
+                    role === "buyer"
+                  }
+                  onChange={(e) =>
+                    setRole(
+                      e.target.value
+                    )
+                  }
+                />
+
+                <span>
+                  Buyer
+                </span>
+
+              </label>
+
+            </div>
+
+          </div>
 
           {/* AMOUNT */}
           <div>
@@ -277,30 +339,7 @@ export default function CreateOrderPage() {
 
           </div>
 
-          {/* KYC NOTICE */}
-          <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-5 text-yellow-300 text-sm leading-7">
-
-            ⚠ All traders must
-            complete manual KYC
-            verification before escrow
-            approval.
-
-          </div>
-
-          {/* FEE NOTICE */}
-          <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-5 text-center text-yellow-300 font-bold text-sm leading-7">
-
-            🔥 ESCROW FEES —
-            BELOW 500 USDT → 2%
-            EACH SIDE •
-            500–5000 USDT → 1%
-            EACH SIDE •
-            5000+ USDT →
-            0.5% EACH SIDE 🔥
-
-          </div>
-
-          {/* CALCULATIONS */}
+          {/* FEES */}
           <div className="bg-zinc-800 border border-zinc-700 rounded-2xl p-6 space-y-4">
 
             <div className="flex justify-between">
