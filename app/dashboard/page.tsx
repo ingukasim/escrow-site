@@ -1,17 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Navbar from "../components/Navbar";
 import { supabase } from "../../lib/supabase";
 
 export default function DashboardPage() {
-
-  const router = useRouter();
-
-  const [user, setUser] =
-    useState<any>(null);
 
   const [orders, setOrders] =
     useState<any[]>([]);
@@ -19,50 +13,65 @@ export default function DashboardPage() {
   const [loading, setLoading] =
     useState(true);
 
-  const [copiedId, setCopiedId] =
+  const [userEmail, setUserEmail] =
     useState("");
 
   useEffect(() => {
 
-    checkUser();
+    loadDashboard();
 
   }, []);
 
-  const checkUser = async () => {
+  const loadDashboard =
+    async () => {
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } =
+        await supabase.auth.getUser();
 
-    if (!user) {
+      if (!user) {
 
-      router.push("/login");
+        setLoading(false);
 
-      return;
-    }
+        return;
+      }
 
-    setUser(user);
+      setUserEmail(
+        user.email || ""
+      );
 
-    loadOrders(user.id);
+      const isAdmin =
+        user.email ===
+        "escrowusdt.info@gmail.com";
 
-  };
-
-  const loadOrders = async (
-    userId: string
-  ) => {
-
-    try {
-
-      const { data, error } =
-        await supabase
+      let query =
+        supabase
           .from("orders")
           .select("*")
-          .or(
-            `seller_id.eq.${userId},joined_user_id.eq.${userId}`
-          )
-          .order("created_at", {
-            ascending: false,
-          });
+          .order(
+            "created_at",
+            {
+              ascending: false,
+            }
+          );
+
+      /* ADMIN SEES ALL */
+
+      if (!isAdmin) {
+
+        query =
+          query.or(
+            `seller_id.eq.${user.id},joined_user_id.eq.${user.id}`
+          );
+
+      }
+
+      const {
+        data,
+        error,
+      } =
+        await query;
 
       if (error) {
 
@@ -74,39 +83,14 @@ export default function DashboardPage() {
 
       }
 
-    } catch (err) {
-
-      console.error(err);
-
-    } finally {
-
       setLoading(false);
-
-    }
-
-  };
-
-  const copyInviteLink =
-    async (orderId: string) => {
-
-      const link =
-        `${window.location.origin}/order/${orderId}`;
-
-      await navigator.clipboard.writeText(
-        link
-      );
-
-      setCopiedId(orderId);
-
-      setTimeout(() => {
-
-        setCopiedId("");
-
-      }, 2000);
 
     };
 
-  const pendingOrders =
+  const totalOrders =
+    orders.length;
+
+  const activeOrders =
     orders.filter(
       (o) =>
         o.status !==
@@ -120,6 +104,18 @@ export default function DashboardPage() {
         "Completed"
     ).length;
 
+  if (loading) {
+
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+
+        Loading dashboard...
+
+      </div>
+    );
+
+  }
+
   return (
     <div className="min-h-screen bg-black text-white">
 
@@ -128,41 +124,44 @@ export default function DashboardPage() {
       <div className="max-w-7xl mx-auto px-6 py-20">
 
         {/* HEADER */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 mb-10">
+        <div className="mb-12">
 
-          <div className="flex flex-wrap items-center justify-between gap-6">
+          <div className="text-yellow-400 text-sm mb-3">
 
-            <div>
+            Premium Escrow Dashboard
 
-              <div className="text-yellow-400 text-sm mb-3">
-                Premium Escrow Dashboard
-              </div>
+          </div>
 
-              <h1 className="text-5xl font-bold mb-4">
-                Welcome Back
-              </h1>
+          <h1 className="text-5xl font-bold mb-4">
 
-              <div className="text-zinc-400">
-                {user?.email}
-              </div>
+            Welcome Back
 
-            </div>
+          </h1>
 
-            <Link
-              href="/create-order"
-              className="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-8 py-4 rounded-2xl transition-all"
-            >
+          <div className="text-zinc-400 text-lg">
 
-              Create New Escrow
-
-            </Link>
+            {userEmail}
 
           </div>
 
         </div>
 
+        {/* CREATE BUTTON */}
+        <div className="mb-12">
+
+          <Link
+            href="/create-order"
+            className="inline-flex items-center bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-8 py-4 rounded-2xl transition-all"
+          >
+
+            + Create New Escrow
+
+          </Link>
+
+        </div>
+
         {/* STATS */}
-        <div className="grid md:grid-cols-3 gap-6 mb-10">
+        <div className="grid md:grid-cols-3 gap-6 mb-12">
 
           <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
 
@@ -171,7 +170,9 @@ export default function DashboardPage() {
             </div>
 
             <div className="text-5xl font-bold text-yellow-400">
-              {orders.length}
+
+              {totalOrders}
+
             </div>
 
           </div>
@@ -183,7 +184,9 @@ export default function DashboardPage() {
             </div>
 
             <div className="text-5xl font-bold text-yellow-400">
-              {pendingOrders}
+
+              {activeOrders}
+
             </div>
 
           </div>
@@ -195,7 +198,9 @@ export default function DashboardPage() {
             </div>
 
             <div className="text-5xl font-bold text-yellow-400">
+
               {completedOrders}
+
             </div>
 
           </div>
@@ -203,62 +208,44 @@ export default function DashboardPage() {
         </div>
 
         {/* ORDERS */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden">
+        <div className="space-y-6">
 
-          <div className="p-8 border-b border-zinc-800">
+          {orders.length ===
+          0 ? (
 
-            <h2 className="text-3xl font-bold text-yellow-400">
+            <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-16 text-center">
 
-              Escrow Orders
+              <div className="text-2xl text-zinc-500">
 
-            </h2>
+                No escrow orders found.
 
-          </div>
-
-          {loading ? (
-
-            <div className="p-12 text-center text-zinc-400">
-              Loading orders...
-            </div>
-
-          ) : orders.length === 0 ? (
-
-            <div className="p-12 text-center">
-
-              <div className="text-5xl mb-5">
-                📭
-              </div>
-
-              <div className="text-zinc-400 text-lg">
-                No orders found.
               </div>
 
             </div>
 
           ) : (
 
-            <div className="divide-y divide-zinc-800">
+            orders.map(
+              (order) => (
 
-              {orders.map((order) => (
-
-                <div
+                <Link
                   key={order.id}
-                  className="p-8 hover:bg-zinc-800/50 transition-all"
+                  href={`/order/${order.id}`}
+                  className="block bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-3xl p-8 transition-all"
                 >
 
-                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+                  <div className="flex flex-wrap items-center justify-between gap-6">
 
-                    {/* LEFT */}
-                    <div className="space-y-4">
+                    <div>
 
-                      <div className="text-3xl font-bold text-yellow-400">
+                      <div className="text-3xl font-bold text-yellow-400 mb-4">
 
                         {order.amount}
                         {" "}USDT
 
                       </div>
 
-                      <div className="text-zinc-400 break-all">
+                      <div className="text-zinc-400 mb-2">
 
                         Order ID:
                         {" "}
@@ -268,46 +255,22 @@ export default function DashboardPage() {
 
                       <div className="text-zinc-400">
 
-                        Creator Role:
+                        Created:
                         {" "}
-                        {order.creator_role}
-
-                      </div>
-
-                      <div className="text-zinc-400">
-
-                        Telegram:
-                        {" "}
-                        {order.telegram}
-
-                      </div>
-
-                      <div className="text-zinc-400">
-
-                        Escrow Date:
-                        {" "}
-                        {order.booking_date}
-
-                      </div>
-
-                      <div className="text-zinc-400">
-
-                        Escrow Time:
-                        {" "}
-                        {order.booking_time}
+                        {new Date(
+                          order.created_at
+                        ).toLocaleString()}
 
                       </div>
 
                     </div>
 
-                    {/* RIGHT */}
-                    <div className="flex flex-col gap-4 items-start lg:items-end">
+                    <div>
 
-                      {/* STATUS */}
                       {order.status ===
                       "Completed" ? (
 
-                        <div className="bg-green-500/10 border border-green-500/30 text-green-400 px-5 py-3 rounded-2xl font-bold">
+                        <div className="bg-green-500/10 border border-green-500/30 text-green-400 px-6 py-4 rounded-2xl font-bold">
 
                           ✅ Completed
 
@@ -316,7 +279,7 @@ export default function DashboardPage() {
                       ) : order.status ===
                         "Escrow Secured" ? (
 
-                        <div className="bg-purple-500/10 border border-purple-500/30 text-purple-400 px-5 py-3 rounded-2xl font-bold">
+                        <div className="bg-purple-500/10 border border-purple-500/30 text-purple-400 px-6 py-4 rounded-2xl font-bold">
 
                           🔒 Escrow Secured
 
@@ -325,7 +288,7 @@ export default function DashboardPage() {
                       ) : order.status ===
                         "Payment Sent" ? (
 
-                        <div className="bg-blue-500/10 border border-blue-500/30 text-blue-400 px-5 py-3 rounded-2xl font-bold">
+                        <div className="bg-blue-500/10 border border-blue-500/30 text-blue-400 px-6 py-4 rounded-2xl font-bold">
 
                           💸 Payment Sent
 
@@ -333,7 +296,7 @@ export default function DashboardPage() {
 
                       ) : (
 
-                        <div className="bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 px-5 py-3 rounded-2xl font-bold">
+                        <div className="bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 px-6 py-4 rounded-2xl font-bold">
 
                           ⏳ Pending
 
@@ -341,45 +304,14 @@ export default function DashboardPage() {
 
                       )}
 
-                      {/* BUTTONS */}
-                      <div className="flex flex-wrap gap-3">
-
-                        <Link
-                          href={`/order/${order.id}`}
-                          className="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-6 py-3 rounded-2xl transition-all"
-                        >
-
-                          View Escrow
-
-                        </Link>
-
-                        <button
-                          onClick={() =>
-                            copyInviteLink(
-                              order.id
-                            )
-                          }
-                          className="bg-blue-500 hover:bg-blue-400 text-white font-bold px-6 py-3 rounded-2xl transition-all"
-                        >
-
-                          {copiedId ===
-                          order.id
-                            ? "Copied!"
-                            : "Copy Invite Link"}
-
-                        </button>
-
-                      </div>
-
                     </div>
 
                   </div>
 
-                </div>
+                </Link>
 
-              ))}
-
-            </div>
+              )
+            )
 
           )}
 
