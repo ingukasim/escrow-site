@@ -21,7 +21,7 @@ export default function CreateOrderPage() {
   const [bookingTime, setBookingTime] =
     useState("");
 
-  const [role, setRole] =
+  const [creatorRole, setCreatorRole] =
     useState("seller");
 
   const [loading, setLoading] =
@@ -83,7 +83,7 @@ export default function CreateOrderPage() {
           return;
         }
 
-        const { error } =
+        const { data, error } =
           await supabase
             .from("orders")
             .insert([
@@ -113,12 +113,15 @@ export default function CreateOrderPage() {
                 buyer_receives:
                   buyerReceives,
 
-                role,
+                creator_role:
+                  creatorRole,
 
                 status:
                   "Pending",
               },
-            ]);
+            ])
+            .select()
+            .single();
 
         if (error) {
 
@@ -126,12 +129,8 @@ export default function CreateOrderPage() {
 
         } else {
 
-          alert(
-            "Escrow order created successfully!"
-          );
-
           router.push(
-            "/dashboard"
+            `/order/${data.id}`
           );
 
         }
@@ -204,10 +203,11 @@ export default function CreateOrderPage() {
                   type="radio"
                   value="seller"
                   checked={
-                    role === "seller"
+                    creatorRole ===
+                    "seller"
                   }
                   onChange={(e) =>
-                    setRole(
+                    setCreatorRole(
                       e.target.value
                     )
                   }
@@ -225,10 +225,11 @@ export default function CreateOrderPage() {
                   type="radio"
                   value="buyer"
                   checked={
-                    role === "buyer"
+                    creatorRole ===
+                    "buyer"
                   }
                   onChange={(e) =>
-                    setRole(
+                    setCreatorRole(
                       e.target.value
                     )
                   }
@@ -371,39 +372,100 @@ export default function CreateOrderPage() {
 
             </div>
 
-            <div className="flex justify-between">
+            {/* SELLER VIEW */}
+            {creatorRole ===
+              "seller" && (
 
-              <span>
-                Seller Deposit
-              </span>
+              <>
+                <div className="flex justify-between">
 
-              <span>
+                  <span>
+                    You Deposit
+                  </span>
 
-                {sellerDeposit.toFixed(
-                  2
-                )}{" "}
-                USDT
+                  <span>
 
-              </span>
+                    {sellerDeposit.toFixed(
+                      2
+                    )}{" "}
+                    USDT
 
-            </div>
+                  </span>
 
-            <div className="flex justify-between">
+                </div>
 
-              <span>
-                Buyer Receives
-              </span>
+                <div className="flex justify-between">
 
-              <span>
+                  <span>
+                    Buyer Receives
+                  </span>
 
-                {buyerReceives.toFixed(
-                  2
-                )}{" "}
-                USDT
+                  <span>
 
-              </span>
+                    {buyerReceives.toFixed(
+                      2
+                    )}{" "}
+                    USDT
 
-            </div>
+                  </span>
+
+                </div>
+              </>
+
+            )}
+
+            {/* BUYER VIEW */}
+            {creatorRole ===
+              "buyer" && (
+
+              <>
+                <div className="flex justify-between">
+
+                  <span>
+                    You Will Receive
+                  </span>
+
+                  <span>
+
+                    {buyerReceives.toFixed(
+                      2
+                    )}{" "}
+                    USDT
+
+                  </span>
+
+                </div>
+
+                <div className="flex justify-between">
+
+                  <span>
+                    Seller Must Deposit
+                  </span>
+
+                  <span>
+
+                    {sellerDeposit.toFixed(
+                      2
+                    )}{" "}
+                    USDT
+
+                  </span>
+
+                </div>
+              </>
+
+            )}
+
+          </div>
+
+          {/* INVITE INFO */}
+          <div className="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-5 text-blue-300 text-sm leading-7">
+
+            💡 After escrow creation,
+            you will receive a unique
+            escrow invite link to send
+            to your counterparty via
+            Telegram or WhatsApp.
 
           </div>
 
