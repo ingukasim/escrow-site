@@ -129,6 +129,10 @@ export default function OrderPage() {
 
         setOrder(data);
 
+        setBuyerWallet(
+          data.buyer_wallet || ""
+        );
+
         /* DETECT ROLE */
 
         if (
@@ -168,6 +172,47 @@ export default function OrderPage() {
       } finally {
 
         setLoading(false);
+
+      }
+
+    };
+
+  /* SAVE BUYER WALLET */
+
+  const saveBuyerWallet =
+    async () => {
+
+      if (!buyerWallet) {
+
+        setMessage(
+          "Please enter wallet address"
+        );
+
+        return;
+      }
+
+      const { error } =
+        await supabase
+          .from("orders")
+          .update({
+            buyer_wallet:
+              buyerWallet,
+          })
+          .eq("id", orderId);
+
+      if (error) {
+
+        setMessage(
+          error.message
+        );
+
+      } else {
+
+        setMessage(
+          "✅ Buyer wallet saved successfully!"
+        );
+
+        initializePage();
 
       }
 
@@ -235,6 +280,15 @@ export default function OrderPage() {
 
   const releaseEscrow =
     async () => {
+
+      if (!order.buyer_wallet) {
+
+        setMessage(
+          "Buyer wallet missing"
+        );
+
+        return;
+      }
 
       const { error } =
         await supabase
@@ -361,71 +415,96 @@ export default function OrderPage() {
 
         </div>
 
-        {/* STATUS */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 mb-10">
+        {/* BUYER SECTION */}
+        {userRole ===
+          "buyer" && (
 
-          <h2 className="text-3xl font-bold text-yellow-400 mb-6">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 mb-10">
 
-            Escrow Status
+            <h2 className="text-3xl font-bold text-yellow-400 mb-8">
 
-          </h2>
+              Buyer Wallet
 
-          <div className="space-y-4 text-lg">
+            </h2>
 
-            <div>
-              ✅ Escrow order created
-            </div>
+            <div className="space-y-6">
 
-            <div>
+              <input
+                type="text"
+                value={buyerWallet}
+                onChange={(e) =>
+                  setBuyerWallet(
+                    e.target.value
+                  )
+                }
+                placeholder="Enter receiving wallet"
+                className="w-full bg-black border border-zinc-700 rounded-2xl p-4 outline-none focus:border-yellow-400"
+              />
 
-              {order.status ===
-              "Escrow Secured" ||
-              order.status ===
-              "Payment Sent" ||
-              order.status ===
-              "Completed"
-                ? "✅ Escrow funded"
-                : "⏳ Awaiting escrow funding"}
+              <button
+                onClick={saveBuyerWallet}
+                className="bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-4 rounded-2xl transition-all"
+              >
 
-            </div>
+                Save Wallet
 
-            <div>
-
-              {order.status ===
-              "Escrow Secured" ||
-              order.status ===
-              "Payment Sent" ||
-              order.status ===
-              "Completed"
-                ? "✅ Escrow secured"
-                : "⏳ Waiting admin confirmation"}
-
-            </div>
-
-            <div>
+              </button>
 
               {order.status ===
-              "Payment Sent" ||
-              order.status ===
-              "Completed"
-                ? "✅ Buyer payment sent"
-                : "⏳ Buyer payment pending"}
+                "Escrow Secured" && (
 
-            </div>
+                <button
+                  onClick={markAsPaid}
+                  className="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-8 py-4 rounded-2xl transition-all"
+                >
 
-            <div>
+                  I Have Paid
 
-              {order.status ===
-              "Completed"
-                ? "✅ Escrow completed"
-                : "⏳ Awaiting escrow release"}
+                </button>
+
+              )}
 
             </div>
 
           </div>
 
-        </div>
+        )}
+
+        {/* ADMIN VIEW */}
+        {isAdmin &&
+          order.buyer_wallet && (
+
+          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 mb-10">
+
+            <h2 className="text-3xl font-bold text-yellow-400 mb-6">
+
+              Buyer Wallet Address
+
+            </h2>
+
+            <div className="bg-black border border-zinc-700 rounded-2xl p-5 break-all text-lg">
+
+              {order.buyer_wallet}
+
+            </div>
+
+          </div>
+
+        )}
+
+        {/* MESSAGE */}
+        {message && (
+
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 text-center">
+
+            {message}
+
+          </div>
+
+        )}
+
       </div>
+
     </div>
   );
 }
