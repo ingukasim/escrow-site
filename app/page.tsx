@@ -34,7 +34,7 @@ export default function HomePage() {
           <div className="flex items-center gap-4 ml-2 md:ml-4">
 
             <img
-              src="/logo.png"
+              src="/logo-new.png"
               alt="GK Focus"
               className="w-16 h-16 md:w-20 md:h-20 object-contain"
             />
