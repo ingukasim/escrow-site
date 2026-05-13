@@ -1,332 +1,225 @@
 "use client";
 
-import Link from "next/link";
-import {
-  ShieldCheck,
-  Lock,
-  Globe,
-  Zap,
-} from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import { useState } from "react";
 
 export default function HomePage() {
 
-  const [amount, setAmount] =
-    useState("");
+  const [amount, setAmount] = useState(1000);
 
-  const usdtAmount =
-    Number(amount) || 0;
+  let fee = 0;
 
-  let feeRate = 2;
-
-  if (
-    usdtAmount >= 500 &&
-    usdtAmount <= 5000
-  ) {
-
-    feeRate = 1;
-
-  } else if (
-    usdtAmount > 5000
-  ) {
-
-    feeRate = 0.5;
-
+  if (amount <= 500) {
+    fee = 0.02;
+  } else if (amount <= 5000) {
+    fee = 0.01;
+  } else {
+    fee = 0.005;
   }
 
-  const sellerDeposit =
-    usdtAmount +
-    (usdtAmount * feeRate) / 100;
-
-  const buyerReceives =
-    usdtAmount -
-    (usdtAmount * feeRate) / 100;
+  const sellerDeposit = amount + amount * fee;
+  const buyerReceive = amount - amount * fee;
 
   return (
-    <main className="min-h-screen bg-black text-white overflow-hidden relative">
-
-      {/* BACKGROUND */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(34,197,94,0.15),transparent_40%)]" />
-
-      {/* FLOATING SYMBOLS */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-
-        <div className="absolute top-24 left-10 text-green-500/20 text-8xl animate-bounce">
-          ₮
-        </div>
-
-        <div className="absolute top-52 right-20 text-green-400/10 text-9xl animate-pulse">
-          ₮
-        </div>
-
-        <div className="absolute bottom-32 left-1/4 text-green-500/10 text-7xl animate-bounce">
-          ₮
-        </div>
-
-        <div className="absolute bottom-20 right-1/3 text-green-400/10 text-8xl animate-pulse">
-          ₮
-        </div>
-
-      </div>
+    <main className="min-h-screen bg-black text-white overflow-hidden">
 
       {/* NAVBAR */}
-      <header className="relative z-10 border-b border-zinc-800 backdrop-blur-xl">
+
+      <nav className="w-full border-b border-green-500/20 bg-black/70 backdrop-blur-xl sticky top-0 z-50">
 
         <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
 
-            USDT ESCROW
+            <img
+              src="/logo.png"
+              alt="GK Focus"
+              className="w-14 h-14 rounded-full shadow-lg shadow-green-500/20"
+            />
+
+            <div>
+
+              <h1 className="text-2xl font-black tracking-wide text-green-400">
+
+                GK FOCUS
+
+              </h1>
+
+              <p className="text-sm text-gray-400">
+
+                Secure USDT Escrow
+
+              </p>
+
+            </div>
 
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
 
-            <Link
+            <a
               href="/login"
-              className="text-zinc-300 hover:text-white transition"
+              className="text-white hover:text-green-400 transition"
             >
               Login
-            </Link>
+            </a>
 
-            <Link
+            <a
               href="/register"
-              className="bg-green-500 hover:bg-green-400 text-black font-bold px-6 py-3 rounded-2xl transition"
+              className="bg-green-500 hover:bg-green-400 transition px-7 py-3 rounded-2xl font-bold text-black"
             >
               Register
-            </Link>
+            </a>
 
           </div>
 
         </div>
 
-      </header>
+      </nav>
 
       {/* HERO */}
-      <section className="relative z-10 max-w-7xl mx-auto px-6 py-20 md:py-32">
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <section className="relative py-20 md:py-32 px-6">
 
-          {/* LEFT */}
+        <div className="absolute inset-0 opacity-10">
+
+          <div className="absolute top-20 left-20 text-[200px] text-green-400 animate-pulse">
+            ₮
+          </div>
+
+          <div className="absolute bottom-20 right-20 text-[180px] text-green-500 animate-bounce">
+            ₮
+          </div>
+
+        </div>
+
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
+
           <div>
 
-            <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 text-green-400 px-5 py-2 rounded-full mb-8">
+            <div className="inline-flex items-center gap-3 bg-green-500/10 border border-green-500/20 rounded-full px-6 py-3 text-green-400 mb-8">
 
-              <ShieldCheck size={18} />
+              <ShieldCheck className="w-5 h-5" />
 
               Secure OTC Escrow Platform
 
             </div>
 
-            <h1 className="text-4xl sm:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-5xl md:text-7xl font-black leading-tight mb-8">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-black leading-tight mb-8">
 
               Buy & Sell
-              <span className="text-green-400">
-                {" "}USDT
-              </span>
 
-              <br />
+              <span className="block text-green-400">
+                USDT
+              </span>
 
               Safely With Escrow
 
             </h1>
 
-            <p className="text-zinc-400 text-xl leading-9 mb-10 max-w-2xl">
+            <p className="text-xl text-gray-400 max-w-2xl leading-relaxed mb-10">
 
               Professional crypto escrow platform with secure custody,
-              admin verification, realtime escrow updates,
-              and protected OTC trading.
+              admin verification, realtime escrow updates, and protected
+              OTC transactions worldwide.
 
             </p>
 
             <div className="flex flex-wrap gap-5">
 
-              <Link
+              <a
                 href="/register"
-                className="bg-green-500 hover:bg-green-400 text-black font-bold px-8 py-5 rounded-2xl text-lg transition"
+                className="bg-green-500 hover:bg-green-400 transition px-10 py-5 rounded-2xl text-black font-black text-lg"
               >
-
                 Create Escrow
+              </a>
 
-              </Link>
-
-              <Link
-                href="/login"
-                className="border border-zinc-700 hover:border-green-500 text-white px-8 py-5 rounded-2xl text-lg transition"
+              <a
+                href="#calculator"
+                className="border border-green-500/30 hover:border-green-400 transition px-10 py-5 rounded-2xl font-bold"
               >
-
-                Login
-
-              </Link>
+                Fee Calculator
+              </a>
 
             </div>
 
           </div>
 
-          {/* RIGHT */}
-          <div className="relative">
+          {/* CALCULATOR */}
 
-            <div className="bg-zinc-900 border border-zinc-800 rounded-[40px] p-6 md:p-10 shadow-2xl shadow-green-500/10">
+          <div
+            id="calculator"
+            className="bg-[#111116] border border-green-500/10 rounded-[40px] p-6 md:p-10 shadow-2xl"
+          >
 
-              <div className="mb-8">
+            <div className="inline-flex items-center gap-3 bg-green-500/10 border border-green-500/20 rounded-full px-6 py-3 text-green-400 mb-8 animate-pulse">
 
-                <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/30 text-green-400 px-5 py-2 rounded-full animate-pulse">
+              🔥 LOW FEES FOR LARGE TRANSACTIONS
 
-                  🔥 LOW FEES FOR LARGE TRANSACTIONS
+            </div>
+
+            <h2 className="text-3xl md:text-5xl font-black mb-10">
+
+              Escrow Fee Calculator
+
+            </h2>
+
+            <div className="space-y-8">
+
+              <div>
+
+                <label className="block text-gray-400 mb-3">
+
+                  Enter USDT Amount
+
+                </label>
+
+                <input
+                  type="number"
+                  value={amount}
+                  onChange={(e) => setAmount(Number(e.target.value))}
+                  className="w-full bg-black border border-green-500/20 rounded-3xl px-8 py-6 text-3xl font-bold outline-none focus:border-green-400"
+                />
+
+              </div>
+
+              <div className="bg-black rounded-3xl p-6 border border-green-500/10">
+
+                <div className="text-gray-400 mb-2">
+                  Seller Deposit
+                </div>
+
+                <div className="text-3xl font-black text-green-400">
+
+                  {sellerDeposit.toFixed(2)} USDT
 
                 </div>
 
               </div>
 
-              <h2 className="text-3xl md:text-4xl font-black mb-8">
+              <div className="bg-black rounded-3xl p-6 border border-green-500/10">
 
-                Escrow Fee Calculator
+                <div className="text-gray-400 mb-2">
+                  Buyer Receives
+                </div>
 
-              </h2>
+                <div className="text-3xl font-black text-green-400">
 
-              <div className="space-y-6">
-
-                <div>
-
-                  <div className="text-zinc-400 mb-3">
-
-                    Enter USDT Amount
-
-                  </div>
-
-                  <input
-                    type="number"
-                    placeholder="1000"
-                    value={amount}
-                    onChange={(e) =>
-                      setAmount(
-                        e.target.value
-                      )
-                    }
-                    className="w-full bg-black border border-zinc-700 rounded-2xl p-5 text-2xl outline-none focus:border-green-500"
-                  />
+                  {buyerReceive.toFixed(2)} USDT
 
                 </div>
 
-                <div className="bg-black border border-zinc-800 rounded-2xl p-5 flex items-center justify-between">
+              </div>
 
-                  <div>
+              <div className="bg-green-500/10 border border-green-500/20 rounded-3xl p-6">
 
-                    <div className="text-zinc-500 text-sm">
+                <div className="text-green-400 font-bold leading-loose">
 
-                      Seller Deposit
+                  • 0–500 USDT → 2% fee both sides<br />
 
-                    </div>
+                  • 500–5000 USDT → 1% fee both sides<br />
 
-                    <div className="text-2xl font-bold text-green-400">
-
-                      {sellerDeposit.toFixed(
-                        2
-                      )}{" "}
-                      USDT
-
-                    </div>
-
-                  </div>
-
-                </div>
-
-                <div className="bg-black border border-zinc-800 rounded-2xl p-5 flex items-center justify-between">
-
-                  <div>
-
-                    <div className="text-zinc-500 text-sm">
-
-                      Buyer Receives
-
-                    </div>
-
-                    <div className="text-2xl font-bold text-green-400">
-
-                      {buyerReceives.toFixed(
-                        2
-                      )}{" "}
-                      USDT
-
-                    </div>
-
-                  </div>
-
-                </div>
-
-                <div className="bg-black border border-zinc-800 rounded-2xl p-5 flex items-center justify-between">
-
-                  <div>
-
-                    <div className="text-zinc-500 text-sm">
-
-                      Fee Rate
-
-                    </div>
-
-                    <div className="text-2xl font-bold text-yellow-400">
-
-                      {feeRate}%
-
-                    </div>
-
-                  </div>
-
-                </div>
-
-                <div className="bg-green-500/10 border border-green-500/30 rounded-2xl p-5">
-
-                  <div className="space-y-3 text-lg">
-
-                    <div className="flex justify-between">
-
-                      <span>
-
-                        0–500 USDT
-
-                      </span>
-
-                      <span className="text-green-400 font-bold">
-
-                        2%
-
-                      </span>
-
-                    </div>
-
-                    <div className="flex justify-between">
-
-                      <span>
-
-                        500–5000 USDT
-
-                      </span>
-
-                      <span className="text-yellow-400 font-bold">
-
-                        1%
-
-                      </span>
-
-                    </div>
-
-                    <div className="flex justify-between">
-
-                      <span>
-
-                        Above 5000 USDT
-
-                      </span>
-
-                      <span className="text-green-400 font-bold">
-
-                        0.5%
-
-                      </span>
-
-                    </div>
-
-                  </div>
+                  • Above 5000 USDT → 0.5% fee both sides
 
                 </div>
 
@@ -339,146 +232,6 @@ export default function HomePage() {
         </div>
 
       </section>
-
-      {/* FEATURES */}
-      <section className="relative z-10 max-w-7xl mx-auto px-6 py-20">
-
-        <div className="text-center mb-20">
-
-          <div className="text-green-400 font-bold mb-4">
-
-            WHY CHOOSE US
-
-          </div>
-
-          <h2 className="text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-5xl font-black">
-
-            Secure & Trusted Escrow
-
-          </h2>
-
-        </div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
-
-            <Lock
-              className="text-green-400 mb-6"
-              size={40}
-            />
-
-            <h3 className="text-2xl font-bold mb-4">
-
-              Secure Custody
-
-            </h3>
-
-            <p className="text-zinc-400 leading-8">
-
-              Escrow funds protected until both parties complete safely.
-
-            </p>
-
-          </div>
-
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
-
-            <Zap
-              className="text-green-400 mb-6"
-              size={40}
-            />
-
-            <h3 className="text-2xl font-bold mb-4">
-
-              Fast Processing
-
-            </h3>
-
-            <p className="text-zinc-400 leading-8">
-
-              Realtime escrow updates and rapid transaction management.
-
-            </p>
-
-          </div>
-
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
-
-            <Globe
-              className="text-green-400 mb-6"
-              size={40}
-            />
-
-            <h3 className="text-2xl font-bold mb-4">
-
-              Global Trading
-
-            </h3>
-
-            <p className="text-zinc-400 leading-8">
-
-              Trade securely with worldwide crypto buyers and sellers.
-
-            </p>
-
-          </div>
-
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
-
-            <ShieldCheck
-              className="text-green-400 mb-6"
-              size={40}
-            />
-
-            <h3 className="text-2xl font-bold mb-4">
-
-              Verified Escrow
-
-            </h3>
-
-            <p className="text-zinc-400 leading-8">
-
-              Admin-controlled escrow verification for safer OTC trading.
-
-            </p>
-
-          </div>
-
-        </div>
-
-      </section>
-
-      {/* FOOTER */}
-      <footer className="relative z-10 border-t border-zinc-800 py-10 mt-20">
-
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
-
-          <div className="text-zinc-500">
-
-            © 2026 USDT Escrow Platform. All rights reserved.
-
-          </div>
-
-          <div className="flex items-center gap-6 text-zinc-400">
-
-            <Link href="/login">
-
-              Login
-
-            </Link>
-
-            <Link href="/register">
-
-              Register
-
-            </Link>
-
-          </div>
-
-        </div>
-
-      </footer>
 
     </main>
   );
