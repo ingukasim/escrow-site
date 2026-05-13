@@ -35,7 +35,7 @@ export default function HomePage() {
 
             <img
               src="/logo-new.png"
-              alt="GK FOCUS"
+             
               className="w-16 h-16 md:w-20 md:h-20 object-contain"
             />
 
