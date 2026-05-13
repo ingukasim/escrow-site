@@ -30,7 +30,7 @@ export default function LoginPage() {
         <div className="flex flex-col items-center mb-8">
 
           <img
-            src="/logo-new.png"
+            src="/images/logo-new.png"
             alt="GK Focus"
             className="w-24 h-24 object-contain mb-4"
           />

@@ -34,7 +34,7 @@ export default function HomePage() {
           <div className="flex items-center gap-4 ml-2 md:ml-4">
 
             <img
-              src="/logo-new.png"
+              src="/images/logo-new.png"
              
               className="w-16 h-16 md:w-20 md:h-20 object-contain"
             />
