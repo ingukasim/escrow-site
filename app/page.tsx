@@ -25,21 +25,21 @@ export default function HomePage() {
 
       {/* NAVBAR */}
 
-      <nav className="w-full border-b border-green-500/20 bg-black/70 backdrop-blur-xl sticky top-0 z-50">
+      <nav className="w-full border-b border-green-500/20 bg-black/80 backdrop-blur-xl sticky top-0 z-50">
 
         <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-5">
 
             <img
               src="/logo.png"
               alt="GK Focus"
-              className="w-14 h-14 rounded-full shadow-lg shadow-green-500/20"
+              className="w-16 h-16 object-cover rounded-2xl border border-green-500/20 shadow-xl shadow-green-500/20"
             />
 
             <div>
 
-              <h1 className="text-2xl font-black tracking-wide text-green-400">
+              <h1 className="text-3xl font-black tracking-wide text-green-400">
 
                 GK FOCUS
 
@@ -59,14 +59,14 @@ export default function HomePage() {
 
             <a
               href="/login"
-              className="text-white hover:text-green-400 transition"
+              className="text-white hover:text-green-400 transition font-semibold"
             >
               Login
             </a>
 
             <a
               href="/register"
-              className="bg-green-500 hover:bg-green-400 transition px-7 py-3 rounded-2xl font-bold text-black"
+              className="bg-green-500 hover:bg-green-400 transition px-7 py-3 rounded-2xl font-black text-black shadow-lg shadow-green-500/20"
             >
               Register
             </a>
@@ -81,9 +81,11 @@ export default function HomePage() {
 
       <section className="relative py-20 md:py-32 px-6">
 
-        <div className="absolute inset-0 opacity-10">
+        {/* BACKGROUND SYMBOLS */}
 
-          <div className="absolute top-20 left-20 text-[200px] text-green-400 animate-pulse">
+        <div className="absolute inset-0 opacity-10 overflow-hidden">
+
+          <div className="absolute top-20 left-20 text-[220px] text-green-400 animate-pulse">
             ₮
           </div>
 
@@ -94,6 +96,8 @@ export default function HomePage() {
         </div>
 
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
+
+          {/* LEFT */}
 
           <div>
 
@@ -129,7 +133,7 @@ export default function HomePage() {
 
               <a
                 href="/register"
-                className="bg-green-500 hover:bg-green-400 transition px-10 py-5 rounded-2xl text-black font-black text-lg"
+                className="bg-green-500 hover:bg-green-400 transition px-10 py-5 rounded-2xl text-black font-black text-lg shadow-xl shadow-green-500/20"
               >
                 Create Escrow
               </a>
@@ -145,7 +149,7 @@ export default function HomePage() {
 
           </div>
 
-          {/* CALCULATOR */}
+          {/* RIGHT CALCULATOR */}
 
           <div
             id="calculator"
