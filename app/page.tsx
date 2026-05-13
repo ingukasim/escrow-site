@@ -103,9 +103,9 @@ export default function HomePage() {
       </header>
 
       {/* HERO */}
-      <section className="relative z-10 max-w-7xl mx-auto px-6 py-32">
+      <section className="relative z-10 max-w-7xl mx-auto px-6 py-20 md:py-32">
 
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
           {/* LEFT */}
           <div>
@@ -118,7 +118,7 @@ export default function HomePage() {
 
             </div>
 
-            <h1 className="text-6xl md:text-7xl font-black leading-tight mb-8">
+            <h1 className="text-4xl sm:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-5xl md:text-7xl font-black leading-tight mb-8">
 
               Buy & Sell
               <span className="text-green-400">
@@ -166,7 +166,7 @@ export default function HomePage() {
           {/* RIGHT */}
           <div className="relative">
 
-            <div className="bg-zinc-900 border border-zinc-800 rounded-[40px] p-10 shadow-2xl shadow-green-500/10">
+            <div className="bg-zinc-900 border border-zinc-800 rounded-[40px] p-6 md:p-10 shadow-2xl shadow-green-500/10">
 
               <div className="mb-8">
 
@@ -178,7 +178,7 @@ export default function HomePage() {
 
               </div>
 
-              <h2 className="text-4xl font-black mb-8">
+              <h2 className="text-3xl md:text-4xl font-black mb-8">
 
                 Escrow Fee Calculator
 
@@ -351,7 +351,7 @@ export default function HomePage() {
 
           </div>
 
-          <h2 className="text-5xl font-black">
+          <h2 className="text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-3xl md:text-5xl font-black">
 
             Secure & Trusted Escrow
 
