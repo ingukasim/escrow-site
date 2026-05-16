@@ -112,7 +112,14 @@ Welcome Back
 
 <div className="text-zinc-400 text-xl">
 
-Manage your secure USDT escrow transactions.
+Welcome,
+<span className="text-green-400 font-bold ml-2">
+
+{userEmail
+ ? userEmail.split("@")[0]
+ : "GK User"}
+
+</span>
 
 </div>
 
