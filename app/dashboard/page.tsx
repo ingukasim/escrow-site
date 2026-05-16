@@ -22,66 +22,59 @@ export default function Dashboard() {
 
   },[]);
 
-  async function loadDashboard(){
+ async function loadDashboard(){
 
-    try{
+  try{
 
-      const session =
-await supabase.auth.getSession();
+    const {
+      data:{user}
+    } = await supabase.auth.getUser();
 
-const user =
-session?.data?.session?.user;
+    console.log(user);
 
-if (user) {
+    if(user){
 
-  setUserEmail(
-    user.email ??
-    user.user_metadata?.email ??
-    user.user_metadata?.full_name ??
-    "User"
-  );
+      setUserEmail(
+        user.email || "GK User"
+      );
 
-  console.log(user);
+      const {data} = await supabase
+      .from("orders")
+      .select("*")
+      .eq(
+        "seller_id",
+        user.id
+      );
 
-  const { data } = await supabase
+      if(data){
 
-   
-        .from("orders")
-        .select("*")
-        .eq(
-          "seller_id",
-          user.id
-        );
+        setStats({
 
-        if(data){
+          total:data.length,
 
-          setStats({
+          active:data.filter(
+            x=>x.status==="Pending"
+          ).length,
 
-            total:data.length,
+          completed:data.filter(
+            x=>x.status==="Completed"
+          ).length
 
-            active:data.filter(
-              x=>x.status==="Pending"
-            ).length,
-
-            completed:data.filter(
-              x=>x.status==="Completed"
-            ).length
-
-          });
-
-        }
+        });
 
       }
 
-    }catch(err){
-
-      console.log(err);
-
     }
 
-    setLoading(false);
+  }catch(err){
+
+    console.log(err);
 
   }
+
+  setLoading(false);
+
+}
 
   if(loading){
 
