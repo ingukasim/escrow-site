@@ -34,11 +34,20 @@ export default function Dashboard() {
 
       if(user){
 
-        setUserEmail(
-          user.email || "User"
-        );
+      if(user){
 
-        const {data}=await supabase
+  setUserEmail(
+
+    user.user_metadata?.email ||
+    user.email ||
+    user.user_metadata?.full_name ||
+    "User"
+
+  );
+
+  console.log(user);
+
+  const {data}=await supabase
         .from("orders")
         .select("*")
         .eq(
