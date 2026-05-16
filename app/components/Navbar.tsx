@@ -17,7 +17,7 @@ export default function Navbar() {
 
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
 
-        {/* LOGO */}
+        {/* LEFT LOGO */}
 
         <Link
           href="/"
@@ -50,6 +50,13 @@ export default function Navbar() {
           <div className="flex items-center gap-5">
 
             <Link
+              href="/"
+              className="text-zinc-300 hover:text-green-400 transition"
+            >
+              Home
+            </Link>
+
+            <Link
               href="/login"
               className="text-zinc-300 hover:text-green-400 transition"
             >
@@ -68,6 +75,13 @@ export default function Navbar() {
         ) : (
 
           <div className="flex items-center gap-5">
+
+            <Link
+              href="/"
+              className="text-zinc-300 hover:text-green-400 transition"
+            >
+              Home
+            </Link>
 
             <Link
               href="/dashboard"
