@@ -17,6 +17,8 @@ export default function Dashboard() {
     completed:0
   });
 
+  const [orders,setOrders]=useState<any[]>([]);
+
   useEffect(()=>{
 
     loadDashboard();
@@ -31,8 +33,6 @@ export default function Dashboard() {
       const {
         data:{user}
       } = await supabase.auth.getUser();
-
-      console.log(user);
 
       if(user){
 
@@ -51,6 +51,10 @@ export default function Dashboard() {
         );
 
         if(orders){
+
+          setOrders(
+            orders
+          );
 
           setStats({
 
@@ -99,7 +103,7 @@ export default function Dashboard() {
   }
 
 
-  return(
+return(
 
 <div className="min-h-screen bg-black text-white">
 
@@ -115,13 +119,11 @@ Premium Escrow Dashboard
 
 </div>
 
-
 <h1 className="text-6xl font-bold mb-4">
 
 Welcome Back
 
 </h1>
-
 
 <div className="text-zinc-400 text-xl">
 
@@ -150,8 +152,8 @@ className="inline-block bg-yellow-400 hover:bg-yellow-300 text-black font-bold p
 </Link>
 
 
-<div className="grid md:grid-cols-3 gap-8">
 
+<div className="grid md:grid-cols-3 gap-8 mb-16">
 
 <div className="bg-zinc-900 rounded-3xl p-10">
 
@@ -168,7 +170,6 @@ Total Orders
 </div>
 
 </div>
-
 
 
 <div className="bg-zinc-900 rounded-3xl p-10">
@@ -188,7 +189,6 @@ Active Orders
 </div>
 
 
-
 <div className="bg-zinc-900 rounded-3xl p-10">
 
 <div className="text-zinc-400 text-2xl mb-6">
@@ -204,6 +204,66 @@ Completed Orders
 </div>
 
 </div>
+
+</div>
+
+
+
+<h2 className="text-3xl font-bold mb-8">
+
+Your Orders
+
+</h2>
+
+<div className="space-y-4">
+
+{orders.map((order)=>(
+
+<Link
+key={order.id}
+href={`/order/${order.id}`}
+className="block bg-zinc-900 hover:bg-zinc-800 rounded-3xl p-6 border border-zinc-800"
+>
+
+<div className="flex justify-between items-center">
+
+<div>
+
+<div className="text-zinc-400">
+
+Order ID
+
+</div>
+
+<div className="font-bold">
+
+{order.id}
+
+</div>
+
+</div>
+
+<div>
+
+<div className="text-zinc-400">
+
+Status
+
+</div>
+
+<div className="text-yellow-400 font-bold">
+
+{order.status}
+
+</div>
+
+</div>
+
+</div>
+
+</Link>
+
+))}
 
 </div>
 
