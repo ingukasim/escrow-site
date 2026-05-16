@@ -7,8 +7,9 @@ import { supabase } from "@/lib/supabase";
 
 export default function Dashboard() {
 
-  const [userEmail,setUserEmail]=useState("");
   const [loading,setLoading]=useState(true);
+
+  const [userEmail,setUserEmail]=useState("");
 
   const [stats,setStats]=useState({
     total:0,
@@ -22,71 +23,81 @@ export default function Dashboard() {
 
   },[]);
 
- async function loadDashboard(){
 
-  try{
+  async function loadDashboard(){
 
-    const {
-      data:{user}
-    } = await supabase.auth.getUser();
+    try{
 
-    console.log(user);
+      const {
+        data:{user}
+      } = await supabase.auth.getUser();
 
-    if(user){
+      console.log(user);
 
-      setUserEmail(
-        user.email || "GK User"
-      );
+      if(user){
 
-      const {data} = await supabase
-      .from("orders")
-      .select("*")
-      .eq(
-        "seller_id",
-        user.id
-      );
+        setUserEmail(
+          user.email || ""
+        );
 
-      if(data){
+        const {
+          data:orders
+        } = await supabase
+        .from("orders")
+        .select("*")
+        .eq(
+          "seller_id",
+          user.id
+        );
 
-        setStats({
+        if(orders){
 
-          total:data.length,
+          setStats({
 
-          active:data.filter(
-            x=>x.status==="Pending"
-          ).length,
+            total:
+              orders.length,
 
-          completed:data.filter(
-            x=>x.status==="Completed"
-          ).length
+            active:
+              orders.filter(
+                x=>x.status==="Pending"
+              ).length,
 
-        });
+            completed:
+              orders.filter(
+                x=>x.status==="Completed"
+              ).length
+
+          });
+
+        }
 
       }
 
+    }catch(err){
+
+      console.log(err);
+
     }
 
-  }catch(err){
-
-    console.log(err);
+    setLoading(false);
 
   }
 
-  setLoading(false);
-
-}
 
   if(loading){
 
     return(
+
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
 
         Loading Dashboard...
 
       </div>
+
     )
 
   }
+
 
   return(
 
@@ -104,26 +115,30 @@ Premium Escrow Dashboard
 
 </div>
 
-<h1 className="text-6xl font-bold mb-5">
+
+<h1 className="text-6xl font-bold mb-4">
 
 Welcome Back
 
 </h1>
 
+
 <div className="text-zinc-400 text-xl">
 
 Welcome,
+
 <span className="text-green-400 font-bold ml-2">
 
 {userEmail
- ? userEmail.split("@")[0]
- : "GK User"}
+? userEmail.split("@")[0]
+: "GK User"}
 
 </span>
 
 </div>
 
 </div>
+
 
 <Link
 href="/create-order"
@@ -136,6 +151,7 @@ className="inline-block bg-yellow-400 hover:bg-yellow-300 text-black font-bold p
 
 
 <div className="grid md:grid-cols-3 gap-8">
+
 
 <div className="bg-zinc-900 rounded-3xl p-10">
 
@@ -154,6 +170,7 @@ Total Orders
 </div>
 
 
+
 <div className="bg-zinc-900 rounded-3xl p-10">
 
 <div className="text-zinc-400 text-2xl mb-6">
@@ -169,6 +186,7 @@ Active Orders
 </div>
 
 </div>
+
 
 
 <div className="bg-zinc-900 rounded-3xl p-10">
