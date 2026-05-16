@@ -169,7 +169,43 @@ export default function OrderPage() {
             Escrow Details
 
           </h2>
+{/* INVITE PARTICIPANT */}
 
+<div className="bg-black border border-green-500/20 rounded-3xl p-6 mb-8">
+
+  <div className="text-green-400 text-xl font-bold mb-3">
+
+    Invite Buyer / Seller
+
+  </div>
+
+  <div className="text-zinc-400 mb-4">
+
+    Share this link with your participant to join escrow.
+
+  </div>
+
+  <div className="bg-zinc-900 rounded-2xl p-4 break-all mb-4">
+
+    {window.location.origin}/join/{order?.id}
+
+  </div>
+
+  <button
+    onClick={() => {
+      navigator.clipboard.writeText(
+        `${window.location.origin}/join/${order?.id}`
+      )
+      alert("Invite link copied")
+    }}
+    className="bg-green-500 hover:bg-green-400 text-black font-bold px-6 py-3 rounded-2xl"
+  >
+
+    Copy Invite Link
+
+  </button>
+
+</div>
           <div className="grid md:grid-cols-2 gap-8">
 
             <div>
