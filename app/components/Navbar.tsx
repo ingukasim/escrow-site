@@ -27,7 +27,7 @@ export default function Navbar() {
           className="text-2xl font-bold text-yellow-400"
         >
 
-          EscrowUSDT
+          GK FOCUS
 
         </Link>
 
@@ -44,7 +44,7 @@ export default function Navbar() {
           </Link>
 
           <Link
-            href="/create-order"
+            href="/create-escrow"
             className="text-zinc-300 hover:text-yellow-400 transition-all"
           >
 
