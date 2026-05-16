@@ -157,7 +157,7 @@ export default function RegisterPage() {
 
               {loading
                 ? "Creating Account..."
-                : "Create GK Account"}
+                : "Create GK FOCUS ESCROW Account"}
 
             </button>
 
