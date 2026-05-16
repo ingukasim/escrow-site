@@ -69,7 +69,13 @@ export default function LoginPage() {
 
         {/* FORM */}
 
-        <form className="space-y-6">
+        <form
+  onSubmit={(e) => {
+    e.preventDefault();
+    window.location.href="/dashboard";
+  }}
+  className="space-y-6"
+>
 
           <div>
 
