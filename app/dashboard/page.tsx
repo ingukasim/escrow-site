@@ -112,13 +112,7 @@ Welcome Back
 
 <div className="text-zinc-400 text-xl">
 
-Logged in as:
-
-<span className="text-green-400 ml-2">
-
-{userEmail}
-
-</span>
+Manage your secure USDT escrow transactions.
 
 </div>
 
