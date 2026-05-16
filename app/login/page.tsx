@@ -1,165 +1,193 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
 
-  return (
-    <main className="min-h-screen bg-black text-white flex items-center justify-center px-6 relative overflow-hidden">
+  const router = useRouter();
 
-      {/* BACKGROUND */}
+  const [email,setEmail]=useState("");
+  const [password,setPassword]=useState("");
+  const [loading,setLoading]=useState(false);
 
-      <div className="absolute inset-0 opacity-10 overflow-hidden">
+  async function handleLogin(
+    e:any
+  ){
 
-        <div className="absolute top-10 left-10 text-[220px] text-green-500 animate-pulse">
-          ₮
-        </div>
-
-        <div className="absolute bottom-10 right-10 text-[180px] text-green-400 animate-bounce">
-          ₮
-        </div>
-
-      </div>
-
-      {/* LOGIN CARD */}
-
-      <div className="relative z-10 w-full max-w-md bg-white/5 border border-green-500/20 backdrop-blur-2xl rounded-[35px] p-8 shadow-2xl">
-
-        {/* LOGO */}
-
-        <div className="flex flex-col items-center mb-8">
-
-          <img
-            src="/images/logo-new.png"
-            alt="GK Focus"
-            className="w-24 h-24 object-contain mb-4"
-          />
-
-          <h1 className="text-4xl font-black text-green-400">
-
-            GK FOCUS
-
-          </h1>
-
-          <p className="text-gray-400 mt-2">
-
-            Secure USDT Escrow
-
-          </p>
-
-        </div>
-
-        {/* TITLE */}
-
-        <div className="mb-8 text-center">
-
-          <h2 className="text-3xl font-black mb-2">
-
-            Welcome Back
-
-          </h2>
-
-          <p className="text-gray-400">
-
-            Login to access your escrow dashboard
-
-          </p>
-
-        </div>
-
-        {/* FORM */}
-
-        <form
-  onSubmit={(e) => {
     e.preventDefault();
-    window.location.href="/dashboard";
-  }}
-  className="space-y-6"
+
+    setLoading(true);
+
+    const {error}=
+    await supabase.auth.signInWithPassword({
+
+      email,
+      password
+
+    });
+
+    setLoading(false);
+
+    if(error){
+
+      alert(error.message);
+      return;
+
+    }
+
+    router.push(
+      "/dashboard"
+    );
+
+  }
+
+  return (
+
+<main className="min-h-screen bg-black text-white flex items-center justify-center px-6 relative overflow-hidden">
+
+
+<div className="absolute inset-0 opacity-10 overflow-hidden">
+
+<div className="absolute top-10 left-10 text-[220px] text-green-500 animate-pulse">
+
+₮
+
+</div>
+
+<div className="absolute bottom-10 right-10 text-[180px] text-green-400 animate-bounce">
+
+₮
+
+</div>
+
+</div>
+
+
+<div className="relative z-10 w-full max-w-md bg-white/5 border border-green-500/20 backdrop-blur-2xl rounded-[35px] p-8 shadow-2xl">
+
+
+<div className="flex flex-col items-center mb-8">
+
+<h1 className="text-4xl font-black text-green-400">
+
+GK FOCUS
+
+</h1>
+
+<p className="text-gray-400 mt-2">
+
+Secure USDT Escrow
+
+</p>
+
+</div>
+
+
+<div className="mb-8 text-center">
+
+<h2 className="text-3xl font-black mb-2">
+
+Welcome Back
+
+</h2>
+
+<p className="text-gray-400">
+
+Login to access your dashboard
+
+</p>
+
+</div>
+
+
+<form
+onSubmit={handleLogin}
+className="space-y-6"
 >
 
-          <div>
+<div>
 
-            <label className="block text-gray-300 mb-2">
+<label className="block text-gray-300 mb-2">
 
-              Email Address
+Email Address
 
-            </label>
+</label>
 
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="w-full bg-black border border-green-500/20 rounded-2xl px-5 py-4 outline-none focus:border-green-400"
-            />
+<input
+type="email"
+value={email}
+onChange={(e)=>
+setEmail(
+e.target.value
+)
+}
+placeholder="Enter your email"
+className="w-full bg-black border border-green-500/20 rounded-2xl px-5 py-4 outline-none focus:border-green-400"
+/>
 
-          </div>
+</div>
 
-          <div>
 
-            <label className="block text-gray-300 mb-2">
+<div>
 
-              Password
+<label className="block text-gray-300 mb-2">
 
-            </label>
+Password
 
-            <input
-              type="password"
-              placeholder="Enter your password"
-              className="w-full bg-black border border-green-500/20 rounded-2xl px-5 py-4 outline-none focus:border-green-400"
-            />
+</label>
 
-          </div>
+<input
+type="password"
+value={password}
+onChange={(e)=>
+setPassword(
+e.target.value
+)
+}
+placeholder="Enter your password"
+className="w-full bg-black border border-green-500/20 rounded-2xl px-5 py-4 outline-none focus:border-green-400"
+/>
 
-          <div className="flex items-center justify-between text-sm">
+</div>
 
-            <label className="flex items-center gap-2 text-gray-400">
 
-              <input type="checkbox" />
+<button
+type="submit"
+disabled={loading}
+className="w-full bg-green-500 hover:bg-green-400 transition py-4 rounded-2xl text-black font-black text-lg"
+>
 
-              Remember me
+{loading
+? "Signing in..."
+: "Login Securely"}
 
-            </label>
+</button>
 
-            <Link
-              href="#"
-              className="text-green-400 hover:text-green-300"
-            >
+</form>
 
-              Forgot Password?
 
-            </Link>
+<div className="text-center mt-8 text-gray-400">
 
-          </div>
+Don't have an account?{" "}
 
-          <button
-            type="submit"
-            className="w-full bg-green-500 hover:bg-green-400 transition py-4 rounded-2xl text-black font-black text-lg shadow-xl shadow-green-500/20"
-          >
+<Link
+href="/register"
+className="text-green-400 font-bold"
+>
 
-            Login Securely
+Register Now
 
-          </button>
+</Link>
 
-        </form>
+</div>
 
-        {/* REGISTER */}
+</div>
 
-        <div className="text-center mt-8 text-gray-400">
+</main>
 
-          Don&apos;t have an account?{" "}
-
-          <Link
-            href="/register"
-            className="text-green-400 hover:text-green-300 font-bold"
-          >
-
-            Register Now
-
-          </Link>
-
-        </div>
-
-      </div>
-
-    </main>
   );
+
 }
