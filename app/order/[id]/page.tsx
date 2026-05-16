@@ -260,7 +260,7 @@ export default function OrderPage() {
 
               <div className="text-xl">
 
-                {order?.preferred_date}
+                {order?.booking_date}
 
               </div>
 
@@ -274,7 +274,7 @@ export default function OrderPage() {
 
               <div className="text-xl">
 
-                {order?.preferred_time}
+                {order?.booking_time}
 
               </div>
 
