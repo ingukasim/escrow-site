@@ -1,14 +1,23 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Navbar() {
+
+  const pathname = usePathname();
+
+  const authPages =
+    pathname === "/login" ||
+    pathname === "/register";
+
   return (
+
     <nav className="w-full border-b border-zinc-800 bg-black/90 backdrop-blur-xl sticky top-0 z-50">
 
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
 
-        {/* LEFT LOGO */}
+        {/* LOGO */}
 
         <Link
           href="/"
@@ -33,35 +42,67 @@ export default function Navbar() {
 
         </Link>
 
+
         {/* RIGHT MENU */}
 
-        <div className="flex items-center gap-5">
+        {authPages ? (
 
-          <Link
-            href="/"
-            className="text-zinc-300 hover:text-green-400 transition"
-          >
-            Home
-          </Link>
+          <div className="flex items-center gap-5">
 
-          <Link
-            href="/login"
-            className="text-zinc-300 hover:text-green-400 transition"
-          >
-            Login
-          </Link>
+            <Link
+              href="/login"
+              className="text-zinc-300 hover:text-green-400 transition"
+            >
+              Login
+            </Link>
 
-          <Link
-            href="/register"
-            className="bg-green-500 hover:bg-green-400 text-black font-bold px-5 py-2 rounded-2xl transition"
-          >
-            Register
-          </Link>
+            <Link
+              href="/register"
+              className="bg-green-500 hover:bg-green-400 text-black font-bold px-5 py-2 rounded-2xl"
+            >
+              Register
+            </Link>
 
-        </div>
+          </div>
+
+        ) : (
+
+          <div className="flex items-center gap-5">
+
+            <Link
+              href="/dashboard"
+              className="text-zinc-300 hover:text-green-400 transition"
+            >
+              Dashboard
+            </Link>
+
+            <Link
+              href="/create-order"
+              className="text-zinc-300 hover:text-green-400 transition"
+            >
+              Create Escrow
+            </Link>
+
+            <button
+              onClick={() => {
+                localStorage.clear();
+                window.location.href="/login";
+              }}
+              className="bg-red-500 hover:bg-red-400 text-white font-bold px-5 py-2 rounded-2xl"
+            >
+
+              Logout
+
+            </button>
+
+          </div>
+
+        )}
 
       </div>
 
     </nav>
+
   );
+
 }
