@@ -93,8 +93,7 @@ export default function RegisterPage() {
             </h1>
 
             <div className="text-zinc-400">
-              Register for verified
-              escrow access.
+               Create your secure USDT escrow account.
             </div>
 
           </div>
