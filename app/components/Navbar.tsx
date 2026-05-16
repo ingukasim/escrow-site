@@ -1,65 +1,62 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { supabase } from "../../lib/supabase";
 
 export default function Navbar() {
-
-  const router = useRouter();
-
-  const handleLogout = async () => {
-
-    await supabase.auth.signOut();
-
-    router.push("/login");
-
-  };
-
   return (
-    <nav className="w-full border-b border-zinc-800 bg-black">
+    <nav className="w-full border-b border-zinc-800 bg-black/90 backdrop-blur-xl sticky top-0 z-50">
 
-      <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
 
-        {/* LOGO */}
+        {/* LEFT LOGO */}
+
         <Link
           href="/"
-          className="text-2xl font-bold text-yellow-400"
+          className="flex items-center gap-3"
         >
 
-          GK FOCUS
+          <div>
+
+            <div className="text-2xl font-black text-green-400">
+
+              GK FOCUS
+
+            </div>
+
+            <div className="text-xs text-zinc-500">
+
+              Secure USDT Escrow
+
+            </div>
+
+          </div>
 
         </Link>
 
-        {/* MENU */}
-        <div className="flex items-center gap-6">
+        {/* RIGHT MENU */}
+
+        <div className="flex items-center gap-5">
 
           <Link
-            href="/dashboard"
-            className="text-zinc-300 hover:text-yellow-400 transition-all"
+            href="/"
+            className="text-zinc-300 hover:text-green-400 transition"
           >
-
-            Dashboard
-
+            Home
           </Link>
 
           <Link
-            href="/create-order"
-            className="text-zinc-300 hover:text-yellow-400 transition-all"
+            href="/login"
+            className="text-zinc-300 hover:text-green-400 transition"
           >
-
-            Create Escrow
-
+            Login
           </Link>
 
-       {false && (
-  <button
-    onClick={handleLogout}
-    className="bg-red-500 hover:bg-red-400 text-white font-bold px-5 py-2 rounded-2xl transition-all"
-  >
-    Logout
-  </button>
-)}
+          <Link
+            href="/register"
+            className="bg-green-500 hover:bg-green-400 text-black font-bold px-5 py-2 rounded-2xl transition"
+          >
+            Register
+          </Link>
 
         </div>
 
