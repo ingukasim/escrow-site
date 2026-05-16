@@ -89,7 +89,7 @@ export default function RegisterPage() {
             </div>
 
             <h1 className="text-4xl font-bold mb-4">
-              Create GK FOCUS ESCROW Account
+              Create GK FOCUS Account
             </h1>
 
             <div className="text-zinc-400">
