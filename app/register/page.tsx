@@ -89,7 +89,7 @@ export default function RegisterPage() {
             </div>
 
             <h1 className="text-4xl font-bold mb-4">
-              Create Account
+              Create GK Account
             </h1>
 
             <div className="text-zinc-400">
@@ -158,7 +158,7 @@ export default function RegisterPage() {
 
               {loading
                 ? "Creating Account..."
-                : "Create Account"}
+                : "Create GK Account"}
 
             </button>
 
