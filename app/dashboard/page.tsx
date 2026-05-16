@@ -26,28 +26,26 @@ export default function Dashboard() {
 
     try{
 
-      const session=
-      await supabase.auth.getSession();
+      const session =
+await supabase.auth.getSession();
 
-      const user=
-      session.data.session?.user;
+const user =
+session?.data?.session?.user;
 
-      if(user){
-
-      if(user){
+if (user) {
 
   setUserEmail(
-
-    user.user_metadata?.email ||
-    user.email ||
-    user.user_metadata?.full_name ||
+    user.email ??
+    user.user_metadata?.email ??
+    user.user_metadata?.full_name ??
     "User"
-
   );
 
   console.log(user);
 
-  const {data}=await supabase
+  const { data } = await supabase
+
+   
         .from("orders")
         .select("*")
         .eq(
