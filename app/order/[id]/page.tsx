@@ -511,8 +511,8 @@ USDT Deposit Verified
 
 </div>
 
-)}
-{/* BANK DETAILS */}
+
+
 {/* BANK DETAILS */}
 
 {userId===order?.seller_id && (
