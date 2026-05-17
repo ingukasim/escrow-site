@@ -514,7 +514,7 @@ USDT Deposit Verified
 )}
 {/* BANK DETAILS */}
 
-{order?.status==="Escrow Secured" && (
+{userId===order?.seller_id && (
 
 <div className="bg-zinc-900 border border-blue-500/20 rounded-3xl p-10 mb-10">
 
