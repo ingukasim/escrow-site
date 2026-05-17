@@ -428,7 +428,6 @@ className="rounded-2xl w-52"
 
 )}
 
-
 </div>
 
 </div>
@@ -511,11 +510,10 @@ USDT Deposit Verified
 
 </div>
 
+)}
 
 
 {/* BANK DETAILS */}
-
-{userId===order?.seller_id && (
 
 <div className="bg-zinc-900 border border-blue-500/20 rounded-3xl p-10 mb-10">
 
@@ -524,6 +522,8 @@ USDT Deposit Verified
 Bank Deposit Details
 
 </h2>
+
+{userId===order?.seller_id ? (
 
 <div className="space-y-5">
 
@@ -555,7 +555,7 @@ className="w-full bg-black border border-zinc-700 rounded-2xl p-4"
 />
 
 <button
-onClick={async () => {
+onClick={async()=>{
 
 await supabase
 .from("orders")
@@ -569,8 +569,6 @@ deposit_note: depositNote
 
 alert("Bank details saved");
 
-location.reload();
-
 }}
 className="bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-4 rounded-2xl"
 >
@@ -581,9 +579,38 @@ Save Details
 
 </div>
 
+) : (
+
+<div className="space-y-4">
+
+<div>
+Bank:
+<b> {order?.bank_name || "-"}</b>
+</div>
+
+<div>
+Account:
+<b> {order?.account_number || "-"}</b>
+</div>
+
+<div>
+Holder:
+<b> {order?.account_holder || "-"}</b>
+</div>
+
+<div className="text-yellow-400">
+
+⚠ {order?.deposit_note || "CDM ONLY"}
+
+</div>
+
 </div>
 
 )}
+
+</div>
+
+
 {/* PAYMENT PROOF */}  
       
         {order?.payment_proof && (
