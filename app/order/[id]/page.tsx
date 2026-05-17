@@ -28,6 +28,17 @@ useState("");
 
 const [qrCode,setQrCode]=
 useState("");
+const [bankName,setBankName]=
+useState("");
+
+const [accountNumber,setAccountNumber]=
+useState("");
+
+const [accountHolder,setAccountHolder]=
+useState("");
+
+const [depositNote,setDepositNote]=
+useState("CDM ONLY");
 
   useEffect(() => {
 
@@ -377,6 +388,10 @@ Admin USDT Receiving Wallet
 <div className="bg-black rounded-2xl p-4 break-all">
 
 {wallet}
+
+</div>
+
+
 <div className="mt-5">
 
 <div className="text-zinc-400 mb-2">
@@ -412,6 +427,7 @@ className="rounded-2xl w-52"
 </div>
 
 )}
+
 
 </div>
 
@@ -496,7 +512,112 @@ USDT Deposit Verified
 </div>
 
 )}
+{/* BANK DETAILS */}
 
+{order?.status==="Escrow Secured" && (
+
+<div className="bg-zinc-900 border border-blue-500/20 rounded-3xl p-10 mb-10">
+
+<h2 className="text-3xl font-bold text-blue-400 mb-8">
+
+Bank Deposit Details
+
+</h2>
+
+{userId===order?.seller_id ? (
+
+<div className="space-y-5">
+
+<input
+placeholder="Bank Name"
+value={bankName}
+onChange={(e)=>
+setBankName(e.target.value)
+}
+className="w-full bg-black border border-zinc-700 rounded-2xl p-4"
+/>
+
+<input
+placeholder="Account Number"
+value={accountNumber}
+onChange={(e)=>
+setAccountNumber(e.target.value)
+}
+className="w-full bg-black border border-zinc-700 rounded-2xl p-4"
+/>
+
+<input
+placeholder="Account Holder Name"
+value={accountHolder}
+onChange={(e)=>
+setAccountHolder(e.target.value)
+}
+className="w-full bg-black border border-zinc-700 rounded-2xl p-4"
+/>
+
+<input
+value={depositNote}
+onChange={(e)=>
+setDepositNote(e.target.value)
+}
+className="w-full bg-black border border-zinc-700 rounded-2xl p-4"
+/>
+
+<button
+
+onClick={async()=>{
+
+await supabase
+.from("orders")
+.update({
+
+bank_name:
+bankName,
+
+account_number:
+accountNumber,
+
+account_holder:
+accountHolder,
+
+deposit_note:
+depositNote
+
+})
+.eq(
+"id",
+order?.id
+);
+
+alert(
+"Bank details saved"
+);
+
+location.reload();
+
+}}
+
+className="bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-4 rounded-2xl"
+>
+
+Save Details
+
+</button>
+</div>
+
+) : (
+
+<div className="text-yellow-400">
+
+⚠ CDM ONLY
+
+</div>
+
+)}
+
+</div>
+
+)}
 {/* PAYMENT PROOF */}  
       
         {order?.payment_proof && (
