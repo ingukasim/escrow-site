@@ -187,23 +187,32 @@ export default function OrderPage() {
 
   <div className="bg-zinc-900 rounded-2xl p-4 break-all mb-4">
 
-    {window.location.origin}/join/{order?.id}
+    {typeof window !== "undefined"
+? `${window.location.origin}/join/${order?.id}`
+: ""}
 
   </div>
 
-  <button
-    onClick={() => {
-      navigator.clipboard.writeText(
-        `${window.location.origin}/join/${order?.id}`
-      )
-      alert("Invite link copied")
-    }}
-    className="bg-green-500 hover:bg-green-400 text-black font-bold px-6 py-3 rounded-2xl"
-  >
+ 
+ <button
+onClick={() => {
 
-    Copy Invite Link
+const inviteLink =
+`${window.location.origin}/join/${order?.id}`;
 
-  </button>
+navigator.clipboard.writeText(
+inviteLink
+);
+
+alert("Invite link copied");
+
+}}
+className="bg-green-500 hover:bg-green-400 text-black font-bold px-6 py-3 rounded-2xl"
+>
+
+Copy Invite Link
+
+</button>
 
 </div>
           <div className="grid md:grid-cols-2 gap-8">
