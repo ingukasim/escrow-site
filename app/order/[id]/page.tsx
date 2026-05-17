@@ -323,8 +323,9 @@ Copy Invite Link
 {/* ADMIN CONTROLS */}
 
 {(
-  userEmail==="escrowusdt.info@gmail.com" ||
-  userId===order?.seller_id
+userEmail==="escrowusdt.info@gmail.com"
+||
+userId===order?.seller_id
 ) && (
 
 <div className="bg-zinc-900 border border-green-500/20 rounded-3xl p-10 mb-10">
@@ -346,7 +347,7 @@ Admin USDT Receiving Wallet
 
 <div className="bg-black rounded-2xl p-4 break-all">
 
-YOUR-USDT-WALLET-ADDRESS-HERE
+YOUR_REAL_USDT_WALLET_HERE
 
 </div>
 
@@ -354,6 +355,8 @@ YOUR-USDT-WALLET-ADDRESS-HERE
 
 
 {userId===order?.seller_id && (
+
+<div className="space-y-5">
 
 <div>
 
@@ -368,8 +371,10 @@ type="file"
 className="w-full bg-black border border-zinc-700 rounded-2xl p-4"
 />
 
+</div>
+
 <button
-className="mt-5 bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-4 rounded-2xl"
+className="bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-4 rounded-2xl"
 >
 
 Paid
@@ -383,7 +388,13 @@ Paid
 
 {userEmail==="escrowusdt.info@gmail.com" && (
 
-<div>
+<div className="mt-8">
+
+<div className="text-zinc-400 mb-5">
+
+Seller deposit verification panel
+
+</div>
 
 <button
 
@@ -406,48 +417,7 @@ location.reload();
 
 }}
 
-className="mt-5 bg-green-500 hover:bg-green-400 text-black font-bold px-8 py-4 rounded-2xl"
-
->
-
-USDT Deposit Verified
-
-</button>
-
-</div>
-
-)}
-
-</div>
-
-)}
-
-{userEmail==="escrowusdt.info@gmail.com" && (
-
-<div>
-
-<button
-
-onClick={async()=>{
-
-await supabase
-.from("orders")
-.update({
-
-status:
-"Escrow Secured"
-
-})
-.eq(
-"id",
-order?.id
-);
-
-location.reload();
-
-}}
-
-className="mt-5 bg-green-500 hover:bg-green-400 text-black font-bold px-8 py-4 rounded-2xl"
+className="bg-green-500 hover:bg-green-400 text-black font-bold px-8 py-4 rounded-2xl"
 
 >
 
