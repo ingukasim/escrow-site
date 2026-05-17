@@ -45,10 +45,10 @@ export default function Dashboard() {
         } = await supabase
         .from("orders")
         .select("*")
-        .eq(
-          "seller_id",
-          user.id
-        );
+       .or(
+`seller_id.eq.${user.id},
+participant_id.eq.${user.id}`
+);
 
         if(orders){
 

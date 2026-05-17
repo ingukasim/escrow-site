@@ -62,14 +62,16 @@ await supabase
 .update({
 
 status:
-"Participant Joined"
+"Participant Joined",
+
+participant_id:
+user.id
 
 })
 .eq(
 "id",
 id
 );
-
 router.push(
 `/order/${id}`
 );
