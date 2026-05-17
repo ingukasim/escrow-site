@@ -513,6 +513,7 @@ USDT Deposit Verified
 
 )}
 {/* BANK DETAILS */}
+{/* BANK DETAILS */}
 
 {userId===order?.seller_id && (
 
@@ -524,101 +525,52 @@ Bank Deposit Details
 
 </h2>
 
-{userId===order?.seller_id ? (
-
 <div className="space-y-5">
 
 <input
 placeholder="Bank Name"
 value={bankName}
-onChange={(e)=>
-setBankName(e.target.value)
-}
+onChange={(e)=>setBankName(e.target.value)}
 className="w-full bg-black border border-zinc-700 rounded-2xl p-4"
 />
 
 <input
 placeholder="Account Number"
 value={accountNumber}
-onChange={(e)=>
-setAccountNumber(e.target.value)
-}
+onChange={(e)=>setAccountNumber(e.target.value)}
 className="w-full bg-black border border-zinc-700 rounded-2xl p-4"
 />
 
 <input
 placeholder="Account Holder Name"
 value={accountHolder}
-onChange={(e)=>
-setAccountHolder(e.target.value)
-}
+onChange={(e)=>setAccountHolder(e.target.value)}
 className="w-full bg-black border border-zinc-700 rounded-2xl p-4"
 />
 
 <input
 value={depositNote}
-onChange={(e)=>
-setDepositNote(e.target.value)
-}
+onChange={(e)=>setDepositNote(e.target.value)}
 className="w-full bg-black border border-zinc-700 rounded-2xl p-4"
 />
 
 <button
-
-onClick={async()=>{
+onClick={async () => {
 
 await supabase
 .from("orders")
 .update({
-
-bank_name:
-bankName,
-
-account_number:
-accountNumber,
-
-account_holder:
-accountHolder,
-
-deposit_note:
-depositNote
-
+bank_name: bankName,
+account_number: accountNumber,
+account_holder: accountHolder,
+deposit_note: depositNote
 })
-.eq(
-"id",
-order?.id
-);
+.eq("id",order?.id);
 
-alert(
-"Bank details saved"
-);
+alert("Bank details saved");
 
 location.reload();
 
-}}
-
-<button
-onClick={async () => {
-  try {
-
-    await supabase
-      .from("orders")
-      .update({
-        bank_name: bankName,
-        account_number: accountNumber,
-        account_holder: accountHolder,
-        deposit_note: depositNote
-      })
-      .eq("id", order?.id);
-
-    alert("Bank details saved");
-
-  } catch(err){
-
-    console.log(err);
-    alert("Failed to save");
-
-  }
 }}
 className="bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-4 rounded-2xl"
 >
@@ -626,17 +578,8 @@ className="bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-4 rounded-
 Save Details
 
 </button>
-</div>
-
-) : (
-
-<div className="text-yellow-400">
-
-⚠ CDM ONLY
 
 </div>
-
-)}
 
 </div>
 
