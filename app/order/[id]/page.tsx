@@ -422,21 +422,9 @@ USDT Deposit Verified
 
 )}
 
-<div className="bg-black rounded-2xl p-4 break-all">
+{userEmail==="escrowusdt.info@gmail.com" && (
 
-PASTE-YOUR-USDT-WALLET-HERE
-
-</div>
-
-</div>
-
-
-<div className="text-zinc-400 mb-5">
-
-Seller deposits USDT → upload proof → admin verifies manually.
-
-</div>
-
+<div>
 
 <button
 
@@ -459,7 +447,7 @@ location.reload();
 
 }}
 
-className="bg-green-500 hover:bg-green-400 text-black font-bold px-8 py-4 rounded-2xl"
+className="mt-5 bg-green-500 hover:bg-green-400 text-black font-bold px-8 py-4 rounded-2xl"
 
 >
 
@@ -470,7 +458,13 @@ USDT Deposit Verified
 </div>
 
 )}
-        {/* PAYMENT PROOF */}
+
+</div>
+
+)}
+
+{/* PAYMENT PROOF */}  
+      
         {order?.payment_proof && (
 
           <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10">
