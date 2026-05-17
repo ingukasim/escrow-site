@@ -18,6 +18,8 @@ export default function OrderPage() {
     useState(true);
 const [userEmail, setUserEmail] =
   useState("");
+const [userId, setUserId] =
+  useState("");
 
   useEffect(() => {
 
@@ -67,11 +69,15 @@ const [userEmail, setUserEmail] =
           .eq("id", orderId)
           .single();
 const {
-  data:{user}
+data:{user}
 }=await supabase.auth.getUser();
 
 setUserEmail(
-  user?.email || ""
+user?.email || ""
+);
+
+setUserId(
+user?.id || ""
 );
       setOrder(data);
 
@@ -316,7 +322,11 @@ Copy Invite Link
         </div>
 {/* ADMIN CONTROLS */}
 
-{userEmail==="escrowusdt.info@gmail.com" && (
+{(
+userEmail==="escrowusdt.info@gmail.com"
+||
+userId===order?.seller_id
+) && (
 
 <div className="bg-zinc-900 border border-green-500/20 rounded-3xl p-10 mb-10">
 
