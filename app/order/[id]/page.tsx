@@ -597,6 +597,29 @@ location.reload();
 
 }}
 
+<button
+onClick={async () => {
+  try {
+
+    await supabase
+      .from("orders")
+      .update({
+        bank_name: bankName,
+        account_number: accountNumber,
+        account_holder: accountHolder,
+        deposit_note: depositNote
+      })
+      .eq("id", order?.id);
+
+    alert("Bank details saved");
+
+  } catch(err){
+
+    console.log(err);
+    alert("Failed to save");
+
+  }
+}}
 className="bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-4 rounded-2xl"
 >
 
