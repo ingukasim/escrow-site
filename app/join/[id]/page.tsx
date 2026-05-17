@@ -10,25 +10,47 @@ const router=useRouter();
 
 const params=useParams();
 
-const id=params.id;
-
 useEffect(()=>{
 
-checkUser();
+joinEscrow();
 
 },[]);
 
-async function checkUser(){
+async function joinEscrow(){
+
+const id=params.id;
 
 const {
 data:{user}
-
 }=await supabase.auth.getUser();
 
 if(!user){
 
 router.push(
-`/login?redirect=/join/${id}`
+`/login`
+);
+
+return;
+
+}
+
+const {data}=await supabase
+.from("orders")
+.select("*")
+.eq(
+"id",
+id
+)
+.single();
+
+if(!data){
+
+alert(
+"Escrow not found"
+);
+
+router.push(
+"/dashboard"
 );
 
 return;
@@ -58,23 +80,17 @@ return(
 
 <div className="min-h-screen bg-black text-white flex items-center justify-center">
 
-<div className="text-center">
+<div>
 
-<div className="text-5xl mb-6">
+<div className="text-4xl mb-5">
 
 🔐
 
 </div>
 
-<div className="text-2xl font-bold">
+<div className="text-xl">
 
 Joining Escrow...
-
-</div>
-
-<div className="text-zinc-400 mt-3">
-
-Please wait...
 
 </div>
 
