@@ -40,14 +40,13 @@ export default function Dashboard() {
           user.email || ""
         );
 
-        const {
-          data:orders
-        } = await supabase
-        .from("orders")
-        .select("*")
-       .or(
-`seller_id.eq.${user.id},
-participant_id.eq.${user.id}`
+const {
+  data:orders
+} = await supabase
+.from("orders")
+.select("*")
+.or(
+`seller_id.eq.${user.id},participant_id.eq.${user.id}`
 );
 
         if(orders){
