@@ -330,20 +330,165 @@ userId===order?.seller_id
 
 <div className="bg-zinc-900 border border-green-500/20 rounded-3xl p-10 mb-10">
 
+
+
 <h2 className="text-3xl font-bold text-green-400 mb-8">
 
-Admin Escrow Panel
+Escrow Funding
 
 </h2>
-
 
 <div className="mb-6">
 
 <div className="text-zinc-400 mb-2">
 
-USDT Receiving Wallet
+Admin USDT Receiving Wallet
 
 </div>
+
+<div className="bg-black rounded-2xl p-4 break-all">
+
+YOUR-USDT-WALLET-ADDRESS-HERE
+
+</div>
+
+</div>
+
+
+{/* SELLER ONLY */}
+
+{userId===order?.seller_id && (
+
+<div className="space-y-5">
+
+<div>
+
+<div className="text-zinc-400 mb-3">
+
+Upload USDT Deposit Proof
+
+</div>
+
+<input
+type="file"
+accept="image/*"
+onChange={async(e)=>{
+
+const file=
+e.target.files?.[0];
+
+if(!file)return;
+
+const fileName=
+`${Date.now()}-${file.name}`;
+
+await supabase
+.storage
+.from("proofs")
+.upload(
+fileName,
+file
+);
+
+const {data}=supabase
+.storage
+.from("proofs")
+.getPublicUrl(
+fileName
+);
+
+await supabase
+.from("orders")
+.update({
+
+seller_deposit_proof:
+data.publicUrl
+
+})
+.eq(
+"id",
+order?.id
+);
+
+alert(
+"Proof uploaded"
+);
+
+location.reload();
+
+}}
+className="w-full bg-black border border-zinc-700 rounded-2xl p-4"
+/>
+
+</div>
+
+
+<button
+className="bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-4 rounded-2xl"
+>
+
+Paid
+
+</button>
+
+</div>
+
+)}
+
+
+{/* ADMIN ONLY */}
+
+{userEmail==="escrowusdt.info@gmail.com"
+&&
+order?.seller_deposit_proof && (
+
+<div className="mt-8">
+
+<div className="text-zinc-400 mb-4">
+
+Seller Deposit Proof
+
+</div>
+
+<img
+src={
+order.seller_deposit_proof
+}
+className="rounded-2xl border border-zinc-700 mb-6"
+/>
+
+<button
+
+onClick={async()=>{
+
+await supabase
+.from("orders")
+.update({
+
+status:
+"Escrow Secured"
+
+})
+.eq(
+"id",
+order?.id
+);
+
+location.reload();
+
+}}
+
+className="bg-green-500 hover:bg-green-400 text-black font-bold px-8 py-4 rounded-2xl"
+
+>
+
+USDT Deposit Verified
+
+</button>
+
+</div>
+
+)}
 
 <div className="bg-black rounded-2xl p-4 break-all">
 
