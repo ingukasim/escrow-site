@@ -323,20 +323,18 @@ Copy Invite Link
 {/* ADMIN CONTROLS */}
 
 {(
-userEmail==="escrowusdt.info@gmail.com"
-||
-userId===order?.seller_id
+  userEmail==="escrowusdt.info@gmail.com" ||
+  userId===order?.seller_id
 ) && (
 
 <div className="bg-zinc-900 border border-green-500/20 rounded-3xl p-10 mb-10">
-
-
 
 <h2 className="text-3xl font-bold text-green-400 mb-8">
 
 Escrow Funding
 
 </h2>
+
 
 <div className="mb-6">
 
@@ -355,11 +353,7 @@ YOUR-USDT-WALLET-ADDRESS-HERE
 </div>
 
 
-{/* SELLER ONLY */}
-
 {userId===order?.seller_id && (
-
-<div className="space-y-5">
 
 <div>
 
@@ -371,60 +365,11 @@ Upload USDT Deposit Proof
 
 <input
 type="file"
-accept="image/*"
-onChange={async(e)=>{
-
-const file=
-e.target.files?.[0];
-
-if(!file)return;
-
-const fileName=
-`${Date.now()}-${file.name}`;
-
-await supabase
-.storage
-.from("proofs")
-.upload(
-fileName,
-file
-);
-
-const {data}=supabase
-.storage
-.from("proofs")
-.getPublicUrl(
-fileName
-);
-
-await supabase
-.from("orders")
-.update({
-
-seller_deposit_proof:
-data.publicUrl
-
-})
-.eq(
-"id",
-order?.id
-);
-
-alert(
-"Proof uploaded"
-);
-
-location.reload();
-
-}}
 className="w-full bg-black border border-zinc-700 rounded-2xl p-4"
 />
 
-</div>
-
-
 <button
-className="bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-4 rounded-2xl"
+className="mt-5 bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-4 rounded-2xl"
 >
 
 Paid
@@ -436,26 +381,9 @@ Paid
 )}
 
 
-{/* ADMIN ONLY */}
+{userEmail==="escrowusdt.info@gmail.com" && (
 
-{userEmail==="escrowusdt.info@gmail.com"
-&&
-order?.seller_deposit_proof && (
-
-<div className="mt-8">
-
-<div className="text-zinc-400 mb-4">
-
-Seller Deposit Proof
-
-</div>
-
-<img
-src={
-order.seller_deposit_proof
-}
-className="rounded-2xl border border-zinc-700 mb-6"
-/>
+<div>
 
 <button
 
@@ -478,13 +406,17 @@ location.reload();
 
 }}
 
-className="bg-green-500 hover:bg-green-400 text-black font-bold px-8 py-4 rounded-2xl"
+className="mt-5 bg-green-500 hover:bg-green-400 text-black font-bold px-8 py-4 rounded-2xl"
 
 >
 
 USDT Deposit Verified
 
 </button>
+
+</div>
+
+)}
 
 </div>
 
