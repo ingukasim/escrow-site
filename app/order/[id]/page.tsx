@@ -20,6 +20,14 @@ const [userEmail, setUserEmail] =
   useState("");
 const [userId, setUserId] =
   useState("");
+const [wallet,setWallet]=
+useState("");
+
+const [network,setNetwork]=
+useState("");
+
+const [qrCode,setQrCode]=
+useState("");
 
   useEffect(() => {
 
@@ -79,7 +87,28 @@ user?.email || ""
 setUserId(
 user?.id || ""
 );
-      setOrder(data);
+const {data:settings}=await supabase
+.from("settings")
+.select("*")
+.limit(1)
+.single();
+
+if(settings){
+
+setWallet(
+settings.wallet_address || ""
+);
+
+setNetwork(
+settings.network || ""
+);
+
+setQrCode(
+settings.qr_code || ""
+);
+
+}     
+ setOrder(data);
 
       setLoading(false);
 
@@ -347,7 +376,42 @@ Admin USDT Receiving Wallet
 
 <div className="bg-black rounded-2xl p-4 break-all">
 
-YOUR_REAL_USDT_WALLET_HERE
+{wallet}
+<div className="mt-5">
+
+<div className="text-zinc-400 mb-2">
+
+Network
+
+</div>
+
+<div className="bg-black rounded-2xl p-4">
+
+{network}
+
+</div>
+
+</div>
+
+
+{qrCode && (
+
+<div className="mt-6">
+
+<div className="text-zinc-400 mb-3">
+
+Scan QR
+
+</div>
+
+<img
+src={qrCode}
+className="rounded-2xl w-52"
+/>
+
+</div>
+
+)}
 
 </div>
 
