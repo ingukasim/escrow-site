@@ -430,7 +430,6 @@ className="rounded-2xl w-52"
 
 </div>
 
-</div>
 
 
 {userId===order?.seller_id && (
@@ -507,13 +506,17 @@ USDT Deposit Verified
 </div>
 
 )}
-
 </div>
+
 
 )}
 
 
 {/* BANK DETAILS */}
+
+{/* BANK DETAILS */}
+
+{userId===order?.seller_id && (
 
 <div className="bg-zinc-900 border border-blue-500/20 rounded-3xl p-10 mb-10">
 
@@ -522,8 +525,6 @@ USDT Deposit Verified
 Bank Deposit Details
 
 </h2>
-
-{userId===order?.seller_id ? (
 
 <div className="space-y-5">
 
@@ -560,14 +561,19 @@ onClick={async()=>{
 await supabase
 .from("orders")
 .update({
-bank_name: bankName,
-account_number: accountNumber,
-account_holder: accountHolder,
-deposit_note: depositNote
+bank_name:bankName,
+account_number:accountNumber,
+account_holder:accountHolder,
+deposit_note:depositNote
 })
-.eq("id",order?.id);
+.eq(
+"id",
+order?.id
+);
 
-alert("Bank details saved");
+alert(
+"Bank details saved"
+);
 
 }}
 className="bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-4 rounded-2xl"
@@ -579,38 +585,102 @@ Save Details
 
 </div>
 
-) : (
+</div>
 
-<div className="space-y-4">
+)}
 
-<div>
+
+{/* BUYER PAYMENT */}
+
+{userId===order?.participant_id && (
+
+<div className="bg-zinc-900 border border-yellow-500/20 rounded-3xl p-10 mb-10">
+
+<h2 className="text-3xl font-bold text-yellow-400 mb-8">
+
+Buyer Payment
+
+</h2>
+
+<div className="space-y-5">
+
+<div className="bg-black rounded-2xl p-4">
+
 Bank:
-<b> {order?.bank_name || "-"}</b>
+<b> {order?.bank_name}</b>
+
 </div>
 
-<div>
+<div className="bg-black rounded-2xl p-4">
+
 Account:
-<b> {order?.account_number || "-"}</b>
+<b> {order?.account_number}</b>
+
+</div>
+
+<div className="bg-black rounded-2xl p-4">
+
+Holder:
+<b> {order?.account_holder}</b>
+
+</div>
+
+<div className="text-red-400 font-bold">
+
+⚠ CDM ONLY — No online transfer / no RTGS
+
 </div>
 
 <div>
-Holder:
-<b> {order?.account_holder || "-"}</b>
+
+<div className="text-zinc-400 mb-3">
+
+Upload CDM Deposit Proof
+
 </div>
 
-<div className="text-yellow-400">
+<input
+type="file"
+className="w-full bg-black border border-zinc-700 rounded-2xl p-4"
+/>
 
-⚠ {order?.deposit_note || "CDM ONLY"}
+</div>
+
+<button
+onClick={async()=>{
+
+await supabase
+.from("orders")
+.update({
+
+status:
+"Payment Sent"
+
+})
+.eq(
+"id",
+order?.id
+);
+
+alert(
+"Payment submitted"
+);
+
+location.reload();
+
+}}
+className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold px-8 py-4 rounded-2xl"
+>
+
+Payment Sent
+
+</button>
 
 </div>
 
 </div>
 
 )}
-
-</div>
-
-
 {/* PAYMENT PROOF */}  
       
         {order?.payment_proof && (
