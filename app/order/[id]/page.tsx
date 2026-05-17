@@ -16,6 +16,8 @@ export default function OrderPage() {
 
   const [loading, setLoading] =
     useState(true);
+const [userEmail, setUserEmail] =
+  useState("");
 
   useEffect(() => {
 
@@ -64,7 +66,13 @@ export default function OrderPage() {
           .select("*")
           .eq("id", orderId)
           .single();
+const {
+  data:{user}
+}=await supabase.auth.getUser();
 
+setUserEmail(
+  user?.email || ""
+);
       setOrder(data);
 
       setLoading(false);
@@ -306,7 +314,75 @@ Copy Invite Link
           </div>
 
         </div>
+{/* ADMIN CONTROLS */}
 
+{userEmail==="escrowusdt.info@gmail.com" && (
+
+<div className="bg-zinc-900 border border-green-500/20 rounded-3xl p-10 mb-10">
+
+<h2 className="text-3xl font-bold text-green-400 mb-8">
+
+Admin Escrow Panel
+
+</h2>
+
+
+<div className="mb-6">
+
+<div className="text-zinc-400 mb-2">
+
+USDT Receiving Wallet
+
+</div>
+
+<div className="bg-black rounded-2xl p-4 break-all">
+
+PASTE-YOUR-USDT-WALLET-HERE
+
+</div>
+
+</div>
+
+
+<div className="text-zinc-400 mb-5">
+
+Seller deposits USDT → upload proof → admin verifies manually.
+
+</div>
+
+
+<button
+
+onClick={async()=>{
+
+await supabase
+.from("orders")
+.update({
+
+status:
+"Escrow Secured"
+
+})
+.eq(
+"id",
+order?.id
+);
+
+location.reload();
+
+}}
+
+className="bg-green-500 hover:bg-green-400 text-black font-bold px-8 py-4 rounded-2xl"
+
+>
+
+USDT Deposit Verified
+
+</button>
+
+</div>
+
+)}
         {/* PAYMENT PROOF */}
         {order?.payment_proof && (
 
