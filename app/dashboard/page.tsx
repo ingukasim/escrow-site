@@ -39,16 +39,32 @@ export default function Dashboard() {
         setUserEmail(
           user.email || ""
         );
-
-const {
-  data:orders
-} = await supabase
+let query = supabase
 .from("orders")
 .select("*")
-.or(
+.order(
+"created_at",
+{ ascending:false }
+);
+
+if (
+user.email !== "escrowusdt.info@gmail.com"
+){
+
+query = query.or(
 `seller_id.eq.${user.id},participant_id.eq.${user.id}`
 );
 
+}
+
+const {
+data: orders,
+error
+} = await query;
+console.log(
+"Dashboard Orders:",
+orders
+);
         if(orders){
 
           setOrders(

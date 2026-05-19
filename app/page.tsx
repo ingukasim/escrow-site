@@ -31,13 +31,15 @@ export default function HomePage() {
 
           {/* LEFT LOGO */}
 
-          <div className="flex items-center gap-4 ml-2 md:ml-4">
+          <div className="flex items-center gap-4 ml-2 md:ml-4 z-50 relative">
 
-            <img
-              src="/images/logo-new.png"
-             
-              className="w-16 h-16 md:w-20 md:h-20 object-contain"
-            />
+<img
+src="/images/logo-new.png"
+alt="GK Logo"
+width={90}
+height={90}
+className="relative z-50 shrink-0"
+/>
 
             <div>
 

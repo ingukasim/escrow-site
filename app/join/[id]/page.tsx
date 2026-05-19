@@ -61,8 +61,6 @@ await supabase
 .from("orders")
 .update({
 
-status:
-"Participant Joined",
 
 participant_id:
 user.id
