@@ -482,16 +482,53 @@ className="w-full bg-black rounded-2xl p-4 text-white"
 <div className="mt-5">
 
 <div className="text-zinc-400 mb-2">
-QR Code Image Link
+Upload QR Image
 </div>
 
 <input
-value={qrCode}
-onChange={(e)=>
+type="file"
+accept="image/*"
+onChange={async(e)=>{
+
+const file =
+e.target.files?.[0];
+
+if(!file) return;
+
+const fileName =
+Date.now() + "-" + file.name;
+
+const { error } =
+await supabase.storage
+.from("qr-codes")
+.upload(
+fileName,
+file
+);
+
+if(error){
+
+alert(
+"Upload failed"
+);
+
+return;
+
+}
+
+const {
+data
+} = supabase.storage
+.from("qr-codes")
+.getPublicUrl(
+fileName
+);
+
 setQrCode(
-e.target.value
-)}
-placeholder="Paste QR image URL"
+data.publicUrl
+);
+
+}}
 className="w-full bg-black rounded-2xl p-4 text-white"
 />
 
