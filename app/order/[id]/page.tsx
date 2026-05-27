@@ -439,7 +439,7 @@ Escrow Funding
 
 <div className="mb-6">
 
-{userEmail==="escrowusdt.info@gmail.com" ? (
+{userEmail==="escrowusdt.info@gmail.com" && (
 
 <div>
 
