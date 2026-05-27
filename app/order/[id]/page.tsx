@@ -472,11 +472,15 @@ onClick={async()=>{
 
 await supabase
 .from("settings")
-.update({
-wallet_address:wallet,
-network:network
-});
+.upsert({
 
+id:1,
+
+wallet_address:wallet,
+
+network:network
+
+});
 alert(
 "Settings Saved Successfully"
 );
