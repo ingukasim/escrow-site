@@ -517,17 +517,21 @@ return;
 }
 
 const {
-data
+data: publicData
 } = supabase.storage
 .from("qr-codes")
 .getPublicUrl(
 fileName
 );
 
-setQrCode(
-data.publicUrl
+console.log(
+"QR URL:",
+publicData.publicUrl
 );
 
+setQrCode(
+publicData.publicUrl
+);
 }}
 className="w-full bg-black rounded-2xl p-4 text-white"
 />
