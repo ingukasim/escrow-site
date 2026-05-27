@@ -117,8 +117,13 @@ const {data:settingsData}=await supabase
 .from("settings")
 .select("*")
 .limit(1);
-
-const settings=settingsData?.[0];
+console.log(
+"RAW SETTINGS:",
+settingsData
+);
+const settings = settingsData && settingsData.length > 0
+? settingsData[0]
+: null;
 
 if(settings){
 
@@ -135,9 +140,10 @@ settings.qr_code || ""
 );
 
 console.log(
-"SETTINGS:",
-settings
+"SETTINGS DATA:",
+settingsData
 );
+
 
 }
  setOrder(data);
