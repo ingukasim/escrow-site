@@ -289,7 +289,7 @@ className="w-14 h-14"
                   value={amount}
                   onChange={(e) =>
                    setAmount(
-                     Number(e.target.value)
+                     e.target.value
                      )
                      }
                   className="w-full bg-black border border-green-500/20 rounded-3xl px-6 py-5 md:px-8 md:py-6 text-2xl md:text-3xl font-bold outline-none focus:border-green-400"
