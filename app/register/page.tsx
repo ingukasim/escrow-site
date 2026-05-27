@@ -83,7 +83,15 @@ export default function RegisterPage() {
 
           {/* HEADER */}
           <div className="text-center mb-10">
+<div className="flex justify-center mb-6">
 
+<img
+src="/images/logo-new.png"
+alt="GK Logo"
+className="w-20 h-20 object-contain"
+/>
+
+</div>
             <div className="text-yellow-400 text-sm mb-3">
               Secure OTC Escrow
             </div>

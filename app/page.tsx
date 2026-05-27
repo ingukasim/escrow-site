@@ -1,25 +1,65 @@
 "use client";
 
 import { ShieldCheck } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "../lib/supabase";
 
 export default function HomePage() {
 
-  const [amount, setAmount] = useState(1000);
+  const [amount,setAmount]=useState("");
+const [successCount,setSuccessCount]=useState(0);
+const [feedbacks,setFeedbacks]=useState([]);
 
-  let fee = 0;
+  const feePercent=
+amount<=500
+?2
+:amount<=5000
+?1
+:0.5;
 
-  if (amount <= 500) {
-    fee = 0.02;
-  } else if (amount <= 5000) {
-    fee = 0.01;
-  } else {
-    fee = 0.005;
-  }
+const sellerDeposit=
+amount
+? Number(amount)+(Number(amount)*feePercent/100)
+:0;
 
-  const sellerDeposit = amount + amount * fee;
-  const buyerReceive = amount - amount * fee;
+const buyerReceive=
+amount
+? Number(amount)-(Number(amount)*feePercent/100)
+:0;
+useEffect(()=>{
 
+const loadStats=async()=>{
+
+const {count}=await supabase
+.from("orders")
+.select(
+"*",
+{count:"exact",head:true}
+)
+.eq(
+"status",
+"Completed");
+
+setSuccessCount(
+count || 0
+);
+const {data:fbData}=await supabase
+.from("feedback")
+.select("*")
+.order(
+"created_at",
+{ascending:false}
+)
+.limit(3);
+
+setFeedbacks(
+fbData || []
+);
+};
+
+loadStats();
+
+},[]);
   return (
     <main className="min-h-screen bg-black text-white overflow-hidden">
 
@@ -101,7 +141,7 @@ className="relative z-50 shrink-0"
 
         </div>
 
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-14 items-center relative z-10">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-14 items-start relative z-10">
 
           {/* LEFT CONTENT */}
 
@@ -127,15 +167,47 @@ className="relative z-50 shrink-0"
 
             </h1>
 
-            <p className="text-lg md:text-2xl text-gray-400 leading-relaxed mb-10 max-w-2xl">
+           <div className="mt-8">
 
-              Professional crypto escrow platform with secure custody,
-              admin verification, realtime escrow updates, and protected
-              OTC transactions worldwide.
+<h3 className="text-3xl font-bold text-white mb-6">
 
-            </p>
+How It Works
 
-            <div className="flex flex-wrap gap-4">
+</h3>
+
+<div className="grid grid-cols-2 gap-4 mb-8">
+
+<div className="bg-black border border-green-500/20 p-4 rounded-2xl text-center">
+1️⃣ Create Escrow
+</div>
+
+<div className="bg-black border border-green-500/20 p-4 rounded-2xl text-center">
+2️⃣ Invite Buyer/Seller
+</div>
+
+<div className="bg-black border border-green-500/20 p-4 rounded-2xl text-center">
+3️⃣ Chat + Payment
+</div>
+
+<div className="bg-black border border-green-500/20 p-4 rounded-2xl text-center">
+4️⃣ Admin Releases USDT
+</div>
+
+</div>
+
+<p className="text-lg md:text-xl text-gray-400 leading-relaxed max-w-2xl">
+
+Professional crypto escrow platform with secure custody,
+admin verification, realtime escrow updates, and protected
+OTC transactions worldwide.
+
+</p>
+
+</div>
+
+            
+
+            <div className="flex flex-wrap gap-4 mt-10">
 
               <a
                 href="/register"
@@ -152,7 +224,35 @@ className="relative z-50 shrink-0"
               </a>
 
             </div>
+<div className="flex gap-8 mt-8 ml-38">
 
+<a
+href="https://t.me/+RegGAvfY-pthYWZl"
+target="_blank"
+className="hover:scale-110 transition"
+>
+
+<img
+src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png"
+className="w-14 h-14"
+/>
+
+</a>
+
+<a
+href="https://wa.me/60182295343"
+target="_blank"
+className="hover:scale-110 transition"
+>
+
+<img
+src="https://cdn-icons-png.flaticon.com/512/733/733585.png"
+className="w-14 h-14"
+/>
+
+</a>
+
+</div>
           </div>
 
           {/* CALCULATOR */}
@@ -187,7 +287,11 @@ className="relative z-50 shrink-0"
                 <input
                   type="number"
                   value={amount}
-                  onChange={(e) => setAmount(Number(e.target.value))}
+                  onChange={(e) =>
+                   setAmount(
+                     Number(e.target.value)
+                     )
+                     }
                   className="w-full bg-black border border-green-500/20 rounded-3xl px-6 py-5 md:px-8 md:py-6 text-2xl md:text-3xl font-bold outline-none focus:border-green-400"
                 />
 
@@ -220,7 +324,19 @@ className="relative z-50 shrink-0"
                 </div>
 
               </div>
+<div className="bg-zinc-900 rounded-3xl p-6 mt-6">
 
+<div className="text-zinc-400">
+Current Fee
+</div>
+
+<div className="text-green-400 text-3xl font-bold">
+
+{feePercent}%
+
+</div>
+
+</div>
               <div className="bg-green-500/10 border border-green-500/20 rounded-3xl p-6">
 
                 <div className="text-green-400 font-bold leading-loose text-sm md:text-lg">
@@ -242,7 +358,130 @@ className="relative z-50 shrink-0"
         </div>
 
       </section>
+<section className="py-20">
 
+<h2 className="text-4xl md:text-5xl font-black text-center mb-12">
+
+Trusted By Traders Worldwide
+
+</h2>
+
+
+<div className="grid md:grid-cols-3 gap-6 mb-16">
+
+<div className="bg-zinc-900 border border-green-500/20 rounded-3xl p-8 text-center">
+
+<div className="text-5xl font-black text-green-400">
+{successCount}+
+</div>
+
+<div className="text-zinc-400 mt-2">
+Successful Escrows
+</div>
+
+</div>
+
+
+<div className="bg-zinc-900 border border-green-500/20 rounded-3xl p-8 text-center">
+
+<div className="text-5xl font-black text-green-400">
+$120K+
+</div>
+
+<div className="text-zinc-400 mt-2">
+USDT Protected
+</div>
+
+</div>
+
+
+<div className="bg-zinc-900 border border-green-500/20 rounded-3xl p-8 text-center">
+
+<div className="text-5xl font-black text-green-400">
+98%
+</div>
+
+<div className="text-zinc-400 mt-2">
+Customer Satisfaction
+</div>
+
+</div>
+
+</div>
+
+
+<h2 className="text-4xl font-black text-center mb-10">
+
+Customer Feedback
+
+</h2>
+
+
+<div className="grid md:grid-cols-3 gap-6">
+
+{feedbacks.map((fb:any,index)=>(
+
+<div
+key={index}
+className="bg-zinc-900 rounded-3xl p-6 border border-green-500/20"
+>
+
+<div className="text-yellow-400 text-xl">
+{"⭐".repeat(fb.rating)}
+</div>
+
+<div className="mt-4 text-zinc-300">
+"{fb.comment}"
+</div>
+
+<div className="mt-5 text-green-400">
+— {fb.user_email}
+</div>
+
+</div>
+
+))}
+
+</div>
+
+<div className="bg-zinc-900 rounded-3xl p-6 border border-green-500/20">
+
+⭐⭐⭐⭐⭐
+
+<div className="mt-4 text-zinc-300">
+
+"Very smooth OTC transaction experience."
+
+</div>
+
+<div className="mt-5 text-green-400">
+
+— OTC Buyer
+
+</div>
+
+</div>
+
+
+<div className="bg-zinc-900 rounded-3xl p-6 border border-green-500/20">
+
+⭐⭐⭐⭐⭐
+
+<div className="mt-4 text-zinc-300">
+
+"Excellent support via Telegram and WhatsApp."
+
+</div>
+
+<div className="mt-5 text-green-400">
+
+— Verified Trader
+
+</div>
+
+</div>
+
+</section>
     </main>
   );
 }

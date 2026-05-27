@@ -11,11 +11,14 @@ export default function Dashboard() {
 
   const [userEmail,setUserEmail]=useState("");
 
-  const [stats,setStats]=useState({
-    total:0,
-    active:0,
-    completed:0
-  });
+ const [stats,setStats]=useState({
+total:0,
+active:0,
+completed:0,
+disputes:0,
+volume:0,
+reviews:0
+});
 
   const [orders,setOrders]=useState<any[]>([]);
 
@@ -84,7 +87,31 @@ orders
             completed:
               orders.filter(
                 x=>x.status==="Completed"
-              ).length
+              ).length,
+
+disputes:
+orders.filter(
+x=>x.dispute===true
+).length,
+
+volume:
+orders.reduce(
+(sum,x)=>
+sum + Number(
+x.amount || 0
+),
+0
+),
+
+reviews:
+(
+await supabase
+.from("feedback")
+.select(
+"*",
+{count:"exact",head:true}
+)
+).count || 0
 
           });
 
@@ -221,7 +248,47 @@ Completed Orders
 </div>
 
 </div>
+<div className="grid md:grid-cols-3 gap-8 mb-16">
 
+<div className="bg-zinc-900 rounded-3xl p-10">
+
+<div className="text-zinc-400 text-2xl mb-6">
+Disputes
+</div>
+
+<div className="text-red-400 text-6xl font-bold">
+{stats.disputes}
+</div>
+
+</div>
+
+
+<div className="bg-zinc-900 rounded-3xl p-10">
+
+<div className="text-zinc-400 text-2xl mb-6">
+USDT Volume
+</div>
+
+<div className="text-green-400 text-6xl font-bold">
+{stats.volume}
+</div>
+
+</div>
+
+
+<div className="bg-zinc-900 rounded-3xl p-10">
+
+<div className="text-zinc-400 text-2xl mb-6">
+Reviews
+</div>
+
+<div className="text-yellow-400 text-6xl font-bold">
+{stats.reviews}
+</div>
+
+</div>
+
+</div>
 
 
 <h2 className="text-3xl font-bold mb-8">

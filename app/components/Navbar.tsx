@@ -19,28 +19,34 @@ export default function Navbar() {
 
         {/* LEFT LOGO */}
 
-        <Link
-          href="/"
-          className="flex items-center gap-3"
-        >
+     <Link
+  href="/"
+  className="flex items-center gap-4"
+>
 
-          <div>
+<img
+src="/images/logo-new.png"
+alt="GK Logo"
+className="w-14 h-14 object-contain"
+/>
 
-            <div className="text-2xl font-black text-green-400">
+<div>
 
-              GK FOCUS
+<div className="text-2xl font-black text-green-400">
 
-            </div>
+GK FOCUS
 
-            <div className="text-xs text-zinc-500">
+</div>
 
-              Secure USDT Escrow
+<div className="text-xs text-zinc-500">
 
-            </div>
+Secure USDT Escrow
 
-          </div>
+</div>
 
-        </Link>
+</div>
+
+</Link>
 
 
         {/* RIGHT MENU */}
@@ -89,7 +95,18 @@ export default function Navbar() {
             >
               Dashboard
             </Link>
-
+<Link
+href="/about"
+className="text-zinc-300 hover:text-green-400 transition"
+>
+About
+</Link>
+<Link
+href="/contact"
+className="text-zinc-300 hover:text-green-400 transition"
+>
+Contact
+</Link>
             <Link
               href="/create-order"
               className="text-zinc-300 hover:text-green-400 transition"
