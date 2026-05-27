@@ -508,8 +508,16 @@ Save Wallet Settings
 Admin USDT Receiving Wallet
 </div>
 
-<div className="bg-black rounded-2xl p-4 break-all">
-{wallet}
+<div className="bg-black rounded-2xl p-4 break-all text-green-400">
+Wallet State: {String(wallet)}
+</div>
+
+<div className="bg-black rounded-2xl p-4 mt-4 text-green-400">
+Network State: {String(network)}
+</div>
+
+<div className="text-red-400 mt-4">
+Current User: {String(userEmail)}
 </div>
 
 <div className="text-zinc-400 mb-2 mt-5">
