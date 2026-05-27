@@ -502,9 +502,7 @@ Save Wallet Settings
 
 </div>
 
-) : (
 
-<div>
 
 <div className="text-zinc-400 mb-2">
 Admin USDT Receiving Wallet
