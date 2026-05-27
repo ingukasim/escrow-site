@@ -463,6 +463,30 @@ e.target.value
 placeholder="Enter network"
 className="w-full bg-black rounded-2xl p-4 text-white"
 />
+<button
+onClick={async()=>{
+
+await supabase
+.from("settings")
+.update({
+
+wallet_address:wallet,
+
+network:network
+
+});
+
+alert(
+"Settings Saved Successfully"
+);
+
+}}
+className="w-full mt-6 bg-green-500 hover:bg-green-400 text-black font-bold py-4 rounded-2xl"
+>
+
+Save Wallet Settings
+
+</button>
 
 </div>
 
