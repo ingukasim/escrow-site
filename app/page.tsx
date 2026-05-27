@@ -8,7 +8,7 @@ export default function HomePage() {
 
   const [amount,setAmount]=useState("");
 const [successCount,setSuccessCount]=useState(0);
-const [feedbacks,setFeedbacks]=useState([]);
+const [feedbacks,setFeedbacks]=useState<any[]>([]);
 
   const feePercent=
 Number(amount)<=500
