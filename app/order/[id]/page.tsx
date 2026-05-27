@@ -532,8 +532,6 @@ Network
 
 </div>
 
-);
-}
 {qrCode && (
 
 <div className="mt-6">
