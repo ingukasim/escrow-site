@@ -439,7 +439,7 @@ Escrow Funding
 
 <div className="mb-6">
 
-{userEmail==="escrowusdt.info@gmail.com" && (
+{userEmail==="escrowusdt.info@gmail.com" ? (
 
 <div>
 
@@ -482,10 +482,7 @@ await supabase
 wallet_address:wallet,
 network:network
 })
-.eq(
-"id",
-1
-);
+.eq("id",1);
 
 alert(
 "Settings Saved Successfully"
@@ -503,12 +500,9 @@ Save Wallet Settings
 
 </div>
 
-)}
+) : (
 
-
-
-
-<div>
+<>
 
 <div className="text-zinc-400 mb-2">
 Admin USDT Receiving Wallet
@@ -518,9 +512,7 @@ Admin USDT Receiving Wallet
 {wallet}
 </div>
 
-<div className="mt-5">
-
-<div className="text-zinc-400 mb-2">
+<div className="text-zinc-400 mb-2 mt-5">
 Network
 </div>
 
@@ -528,7 +520,9 @@ Network
 {network}
 </div>
 
-</div>
+</>
+
+)}
 
 </div>
 
