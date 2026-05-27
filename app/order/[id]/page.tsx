@@ -113,11 +113,12 @@ user?.email || ""
 setUserId(
 user?.id || ""
 );
-const {data:settings}=await supabase
+const {data:settingsData}=await supabase
 .from("settings")
 .select("*")
-.limit(1)
-.single();
+.limit(1);
+
+const settings=settingsData?.[0];
 
 if(settings){
 
@@ -132,22 +133,13 @@ settings.network || ""
 setQrCode(
 settings.qr_code || ""
 );
+
 console.log(
 "SETTINGS:",
 settings
 );
 
-console.log(
-"WALLET:",
-settings?.wallet_address
-);
-
-console.log(
-"NETWORK:",
-settings?.network
-);
-
-}     
+}
  setOrder(data);
 
 console.log(
