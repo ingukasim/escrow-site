@@ -506,7 +506,7 @@ Save Wallet Settings
 )}
 
 
-{userEmail!=="escrowusdt.info@gmail.com" && (
+
 
 <div>
 
@@ -532,9 +532,7 @@ Network
 
 </div>
 
-)}
 
-</div>
 {qrCode && (
 
 <div className="mt-6">
