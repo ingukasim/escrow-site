@@ -54,7 +54,7 @@ escrowusdt.info@gmail.com
 </div>
 
 <div>
-GK Focus Community
+@legends_trust
 </div>
 
 </div>
