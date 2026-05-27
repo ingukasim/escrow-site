@@ -611,9 +611,9 @@ Scan QR
 
 <img
 src={qrCode}
-className="rounded-2xl w-52"
+className="rounded-2xl w-72 bg-white p-3"
+alt="QR Code"
 />
-
 </div>
 
 )}
