@@ -437,31 +437,26 @@ Escrow Funding
 
 Admin USDT Receiving Wallet
 
-</div>
-
-<div className="bg-black rounded-2xl p-4 break-all">
-
-{wallet}
-
-</div>
-
-
-<div className="mt-5">
-
-<div className="text-zinc-400 mb-2">
-
+<input
+value={wallet}
+onChange={(e)=>
+setWallet(
+e.target.value
+)}
+placeholder="Enter wallet address"
+className="w-full bg-black rounded-2xl p-4 text-white"
+/>
 Network
 
-</div>
-
-<div className="bg-black rounded-2xl p-4">
-
-{network}
-
-</div>
-
-</div>
-
+<input
+value={network}
+onChange={(e)=>
+setNetwork(
+e.target.value
+)}
+placeholder="Enter network"
+className="w-full bg-black rounded-2xl p-4 text-white"
+/>
 
 {qrCode && (
 
