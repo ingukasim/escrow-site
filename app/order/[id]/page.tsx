@@ -436,6 +436,7 @@ Escrow Funding
 <div className="text-zinc-400 mb-2">
 
 Admin USDT Receiving Wallet
+</div>
 
 <input
 value={wallet}
@@ -446,7 +447,12 @@ e.target.value
 placeholder="Enter wallet address"
 className="w-full bg-black rounded-2xl p-4 text-white"
 />
+
+<div className="mt-5">
+
+<div className="text-zinc-400 mb-2">
 Network
+</div>
 
 <input
 value={network}
@@ -457,6 +463,10 @@ e.target.value
 placeholder="Enter network"
 className="w-full bg-black rounded-2xl p-4 text-white"
 />
+
+</div>
+
+</div>
 
 {qrCode && (
 
