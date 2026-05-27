@@ -132,6 +132,20 @@ settings.network || ""
 setQrCode(
 settings.qr_code || ""
 );
+console.log(
+"SETTINGS:",
+settings
+);
+
+console.log(
+"WALLET:",
+settings?.wallet_address
+);
+
+console.log(
+"NETWORK:",
+settings?.network
+);
 
 }     
  setOrder(data);
