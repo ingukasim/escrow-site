@@ -479,14 +479,32 @@ placeholder="Enter network"
 className="w-full bg-black rounded-2xl p-4 text-white"
 />
 
+<div className="mt-5">
+
+<div className="text-zinc-400 mb-2">
+QR Code Image Link
+</div>
+
+<input
+value={qrCode}
+onChange={(e)=>
+setQrCode(
+e.target.value
+)}
+placeholder="Paste QR image URL"
+className="w-full bg-black rounded-2xl p-4 text-white"
+/>
+
+</div>
+
 <button
 onClick={async()=>{
-
 await supabase
 .from("settings")
 .update({
 wallet_address:wallet,
-network:network
+network:network,
+qr_code:qrCode
 })
 .eq("id",1);
 
