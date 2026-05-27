@@ -15,14 +15,15 @@ export default function Navbar() {
 
     <nav className="w-full border-b border-zinc-800 bg-black/90 backdrop-blur-xl sticky top-0 z-50">
 
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
 
         {/* LEFT LOGO */}
 
-     <Link
-  href="/"
-  className="flex items-center gap-4"
+  <Link
+href="/"
+className="flex items-center justify-center md:justify-start gap-4"
 >
+
 
 <img
 src="/images/logo-new.png"
@@ -53,7 +54,7 @@ Secure USDT Escrow
 
         {authPages ? (
 
-          <div className="flex items-center gap-5">
+          <div className="flex flex-wrap justify-center md:justify-end items-center gap-3 mt-2 md:mt-0">
 
             <Link
               href="/"
@@ -71,7 +72,7 @@ Secure USDT Escrow
 
             <Link
               href="/register"
-              className="bg-green-500 hover:bg-green-400 text-black font-bold px-5 py-2 rounded-2xl"
+             className="bg-green-500 hover:bg-green-400 text-black font-bold px-6 py-3 rounded-2xl min-w-[120px] text-center"
             >
               Register
             </Link>
@@ -84,7 +85,7 @@ Secure USDT Escrow
 
             <Link
               href="/"
-              className="text-zinc-300 hover:text-green-400 transition"
+              className="text-zinc-300 hover:text-green-400 transition px-2 py-2"
             >
               Home
             </Link>
