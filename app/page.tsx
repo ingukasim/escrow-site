@@ -11,9 +11,9 @@ const [successCount,setSuccessCount]=useState(0);
 const [feedbacks,setFeedbacks]=useState([]);
 
   const feePercent=
-amount<=500
+Number(amount)<=500
 ?2
-:amount<=5000
+:Number(amount)<=5000
 ?1
 :0.5;
 
