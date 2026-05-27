@@ -487,9 +487,6 @@ className="rounded-2xl w-52"
 
 )}
 
-</div>
-
-</div>
 
 {userId===order?.seller_id && (
 
