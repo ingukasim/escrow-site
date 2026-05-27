@@ -486,6 +486,7 @@ network:network
 "id",
 1
 );
+
 alert(
 "Settings Saved Successfully"
 );
@@ -502,7 +503,12 @@ Save Wallet Settings
 
 </div>
 
+)}
 
+
+{userEmail!=="escrowusdt.info@gmail.com" && (
+
+<div>
 
 <div className="text-zinc-400 mb-2">
 Admin USDT Receiving Wallet
