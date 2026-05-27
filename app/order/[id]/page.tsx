@@ -873,9 +873,8 @@ status:
 "id",
 order?.id
 );
-router.push(
-`/feedback/${order?.id}`
-);
+window.location.href=
+`/feedback/${order?.id}`;
 alert(
 "USDT Released Successfully"
 );
