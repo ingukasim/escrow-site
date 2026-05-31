@@ -76,7 +76,7 @@ USD₮
 
 </div>
 
-<div className="absolute bottom-10 right-7 text-[180px] text-green-400 animate-bounce">
+<div className="absolute bottom-10 right-7 text-[100px] text-green-400 animate-bounce">
 
 ESCROW
 
