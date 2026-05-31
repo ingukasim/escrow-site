@@ -21,17 +21,22 @@ async function joinEscrow(){
 const id=params.id;
 
 const {
-data:{user}
-}=await supabase.auth.getUser();
+  data:{user}
+} = await supabase.auth.getUser();
 
 if(!user){
 
-router.push(
-`/login`
+localStorage.setItem(
+  "pendingJoinOrder",
+  String(id)
 );
 
-return;
+alert(
+  "Saved Join Order: " + String(id)
+);
 
+router.push("/login");
+return;
 }
 
 const {data}=await supabase

@@ -38,9 +38,32 @@ export default function LoginPage() {
 
     }
 
-    router.push(
-      "/dashboard"
-    );
+const pendingJoinOrder =
+localStorage.getItem(
+"pendingJoinOrder"
+);
+
+alert(
+"Pending Join Order: " + pendingJoinOrder
+);
+
+if(pendingJoinOrder){
+
+localStorage.removeItem(
+"pendingJoinOrder"
+);
+
+router.push(
+`/join/${pendingJoinOrder}`
+);
+
+}else{
+
+router.push(
+"/dashboard"
+);
+
+}
 
   }
 
