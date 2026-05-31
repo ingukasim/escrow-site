@@ -290,6 +290,7 @@ setLoading(false);
 
           </h2>
 {/* INVITE PARTICIPANT */}
+{userId===order?.seller_id && (
 
 <div className="bg-black border border-green-500/20 rounded-3xl p-6 mb-8">
 
@@ -335,6 +336,7 @@ Copy Invite Link
 </button>
 
 </div>
+)}
           <div className="grid md:grid-cols-2 gap-8">
 
             <div>
