@@ -38,10 +38,19 @@ export default function LoginPage() {
 
     }
 
-if(joinId){
+const pendingJoinOrder =
+sessionStorage.getItem(
+"pendingJoinOrder"
+);
+
+if(pendingJoinOrder){
+
+sessionStorage.removeItem(
+"pendingJoinOrder"
+);
 
 router.push(
-`/join/${joinId}`
+`/join/${pendingJoinOrder}`
 );
 
 }else{

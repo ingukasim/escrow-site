@@ -26,11 +26,10 @@ const {
 
 if(!user){
 
-localStorage.setItem(
-  "pendingJoinOrder",
-  String(id)
+sessionStorage.setItem(
+"pendingJoinOrder",
+String(id)
 );
-
 alert(
   "Saved Join Order: " + String(id)
 );
