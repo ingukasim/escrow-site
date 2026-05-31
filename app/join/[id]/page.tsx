@@ -35,7 +35,9 @@ alert(
   "Saved Join Order: " + String(id)
 );
 
-router.push("/login");
+router.push(
+`/login?join=${id}`
+);
 return;
 }
 
