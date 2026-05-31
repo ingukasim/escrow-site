@@ -72,13 +72,13 @@ router.push(
 
 <div className="absolute top-10 left-10 text-[220px] text-green-500 animate-pulse">
 
-USD₮ ESCROW
+USD₮ 
 
 </div>
 
 <div className="absolute bottom-10 right-10 text-[180px] text-green-400 animate-bounce">
 
-USD₮ ESCROW
+ESCROW
 
 </div>
 
