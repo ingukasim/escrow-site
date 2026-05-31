@@ -57,19 +57,23 @@ return;
 
 }
 
-await supabase
+const { error } = await supabase
 .from("orders")
 .update({
 
-
-participant_id:
-user.id
+participant_id: user.id
 
 })
 .eq(
 "id",
 id
 );
+
+console.log(
+"JOIN ERROR:",
+error
+);
+
 router.push(
 `/order/${id}`
 );
