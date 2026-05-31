@@ -70,7 +70,7 @@ router.push(
 
 <div className="absolute inset-0 opacity-10 overflow-hidden">
 
-<div className="absolute top-10 left-10 text-[220px] text-green-500 animate-pulse">
+<div className="absolute top-10 left-10 text-[200px] text-green-500 animate-pulse">
 
 USD₮ 
 
